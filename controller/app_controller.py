@@ -117,6 +117,12 @@ class AppController:
         self.usuario_logado["idioma"] = idioma
         self.usuario_logado["nivel_aposta"] = nivel_aposta
 
+        Usuario.salvar_config(
+            tema,
+            idioma,
+            nivel_aposta
+        )
+
         messagebox.showinfo(
             "Sucesso",
             "Configurações salvas!"
