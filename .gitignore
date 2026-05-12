@@ -11,3 +11,4 @@ view/__pycache__/login_view.cpython-312.pyc
 __pycache__/
 controller/__pycache__/app_controller.cpython-312.pyc
 model/__pycache__/usuario_model.cpython-312.pyc
+view/__pycache__/pesquisa_view.cpython-311.pyc

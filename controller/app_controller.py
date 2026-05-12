@@ -23,6 +23,7 @@ from services.api_service import (
     criar_corrida
 )
 
+from view.pesquisa_view import PesquisaView
 
 class AppController:
     
@@ -115,7 +116,8 @@ class AppController:
             self.mostrar_configuracoes,
             self.mostrar_banco,
             self.mostrar_corrida,
-            self.mostrar_criar_corrida
+            self.mostrar_criar_corrida,
+            self.mostrar_pesquisa
         )
 
         self.trocar_frame(frame)
@@ -224,6 +226,20 @@ class AppController:
 
         self.trocar_frame(frame)
 
+    # =====================================================
+    # PESQUISA
+    # =====================================================
+
+    def mostrar_pesquisa(self):
+
+        frame = PesquisaView(
+            self.root,
+            self.registrar_pesquisa,
+            self.mostrar_lobby
+        )
+
+        self.trocar_frame(frame)
+
 
     def salvar_corrida(self, dados):
 
@@ -235,3 +251,9 @@ class AppController:
         )
 
         self.mostrar_lobby()
+    def registrar_pesquisa(self, texto):
+
+        Usuario.salvar_pesquisa(
+        self.usuario_logado["usuario"],
+        texto
+    )

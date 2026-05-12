@@ -1,5 +1,6 @@
 import json
-
+from datetime import datetime
+import os
 
 class Usuario:
 
@@ -54,3 +55,36 @@ class Usuario:
             }
 
         return None
+    
+    @staticmethod
+    def salvar_pesquisa(usuario, texto):
+
+        arquivo = "pesquisas.json"
+
+        pesquisas = {}
+
+        if os.path.exists(arquivo):
+
+            with open(arquivo, "r", encoding="utf-8") as f:
+
+                pesquisas = json.load(f)
+
+        if usuario not in pesquisas:
+
+            pesquisas[usuario] = []
+
+        pesquisas[usuario].append({
+            "pesquisa": texto,
+            "horario": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        })
+
+        pesquisas[usuario] = pesquisas[usuario][-15:]
+
+        with open(arquivo, "w", encoding="utf-8") as f:
+
+            json.dump(
+                pesquisas,
+                f,
+                indent=4,
+                ensure_ascii=False
+            )
