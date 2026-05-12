@@ -6,7 +6,7 @@ from view.lobby_view import LobbyView
 from view.corrida_view import CorridaView
 from view.banco_view import BancoView
 from view.configuracoes_view import ConfiguracoesView
-
+from view.pesquisa_view import PesquisaView
 
 class AppController:
 
@@ -91,7 +91,8 @@ class AppController:
             self.logout,
             self.mostrar_configuracoes,
             self.mostrar_banco,
-            self.mostrar_corrida
+            self.mostrar_corrida,
+            self.mostrar_pesquisa
         )
 
         self.trocar_frame(frame)
@@ -181,3 +182,24 @@ class AppController:
         self.usuario_logado = None
 
         self.mostrar_login()
+
+    # =====================================================
+    # PESQUISA
+    # =====================================================
+
+    def mostrar_pesquisa(self):
+
+        frame = PesquisaView(
+            self.root,
+            self.registrar_pesquisa,
+            self.mostrar_lobby
+        )
+
+        self.trocar_frame(frame)
+
+    def registrar_pesquisa(self, texto):
+
+        Usuario.salvar_pesquisa(
+        self.usuario_logado["usuario"],
+        texto
+    )
