@@ -1,15 +1,8 @@
-from fastapi import FastAPI
-from cavalo import router as cavalos_router
-from corridas import router as corridas_router
-from pistas import router as pistas_router
+import tkinter as tk
+from controller.app_controller import AppController
 
-app = FastAPI()
+root = tk.Tk()
 
+app = AppController(root)
 
-app.include_router(cavalos_router)
-app.include_router(corridas_router)
-app.include_router(pistas_router)
-@app.get("/")
-def home():
-    return {"msg": "API funcionando"}
-
+root.mainloop()
