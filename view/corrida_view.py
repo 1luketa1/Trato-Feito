@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
-
+from services.odds_services import gerar_odds_corrida
 
 class CorridaView(tk.Frame):
 
@@ -12,6 +12,8 @@ class CorridaView(tk.Frame):
         aposta_callback,
         voltar_callback,
     ):
+        odds_data = gerar_odds_corrida(corrida["_id"])
+        odds = odds_data["odds"] if odds_data else {}
 
         super().__init__(master)
 
@@ -36,17 +38,20 @@ Distância: {pista['distancia']} km
         self.cavalo = tk.StringVar()
 
         for cavalo in corrida["cavalos"]:
+            cavalo_id = cavalo["_id"]
+            odd = odds.get(cavalo_id, 1.0)
 
             tk.Radiobutton(
-                self,
-                text=f"""
+    self,
+    text=f"""
 {cavalo['nome']}
+Odd: {odd:.2f}
 Velocidade Média: {cavalo['estatisticas']['velocidade_media']}
 Resistência: {cavalo['estatisticas']['resistencia']}
-                """,
-                variable=self.cavalo,
-                value=cavalo["nome"]
-            ).pack(anchor="w", padx=80)
+    """,
+    variable=self.cavalo,
+    value=cavalo["nome"]
+).pack(anchor="w", padx=80)
 
         tk.Label(
             self,
