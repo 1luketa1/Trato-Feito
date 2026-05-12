@@ -195,10 +195,13 @@ def buscar_corrida(id: str):
 @router.post("/")
 def criar_corrida(corrida: dict):
 
-    corrida["data"] = datetime.strptime(
-        corrida["data"],
-        "%Y-%m-%d"
-    )
+    try:
+        corrida["data"] = datetime.strptime(
+            corrida["data"],
+            "%d-%m-%Y"
+        )
+    except:
+        return {"erro": "Data inválida. Use DD-MM-AAAA"}
 
     corrida["pista_id"] = ObjectId(
         corrida["pista_id"]

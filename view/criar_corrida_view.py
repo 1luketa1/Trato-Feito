@@ -36,7 +36,7 @@ class CriarCorridaView(tk.Frame):
         # DATA
         # =====================================================
 
-        tk.Label(self, text="Data (AAAA-MM-DD)").pack()
+        tk.Label(self, text="Data (DD-MM-AAAA)").pack()
 
         self.data = tk.Entry(self, width=40)
         self.data.pack(pady=5)
