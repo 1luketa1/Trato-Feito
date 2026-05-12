@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from bson import ObjectId
+from datetime import datetime
 
 from database import (
     corridas_collection,
@@ -101,10 +102,6 @@ def listar_corridas_ativas():
                 corrida["pista_id"]
             )
 
-        # ==========================================
-        # CAVALOS
-        # ==========================================
-
         cavalos_formatados = []
 
         for cavalo_id in corrida["cavalos"]:
@@ -120,10 +117,6 @@ def listar_corridas_ativas():
                 cavalos_formatados.append(cavalo)
 
         corrida["cavalos"] = cavalos_formatados
-
-        # ==========================================
-        # RESULTADOS
-        # ==========================================
 
         if "resultado" in corrida:
 
@@ -198,3 +191,29 @@ def buscar_corrida(id: str):
     corrida["cavalos"] = cavalos_formatados
 
     return converter_objectid(corrida)
+
+@router.post("/")
+def criar_corrida(corrida: dict):
+
+    corrida["data"] = datetime.strptime(
+        corrida["data"],
+        "%Y-%m-%d"
+    )
+
+    corrida["pista_id"] = ObjectId(
+        corrida["pista_id"]
+    )
+
+    corrida["cavalos"] = [
+        ObjectId(c)
+        for c in corrida["cavalos"]
+    ]
+
+    resultado = corridas_collection.insert_one(
+        corrida
+    )
+
+    return {
+        "msg": "Corrida criada",
+        "id": str(resultado.inserted_id)
+    }

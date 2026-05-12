@@ -13,7 +13,19 @@ from tkinter import messagebox
 from services.api_service import listar_corridas
 
 
+from view.criar_corrida_view import CriarCorridaView
+
+from services.api_service import (
+    listar_corridas_ativas,
+    buscar_corrida,
+    listar_pistas,
+    listar_cavalos,
+    criar_corrida
+)
+
+
 class AppController:
+    
 
     def __init__(self, root):
 
@@ -87,19 +99,23 @@ class AppController:
     # =====================================================
     # LOBBY
     # =====================================================
+    def criar_corrida(self):
+
+        print("Criar corrida clicado")
 
     def mostrar_lobby(self):
 
-        self.corridas = listar_corridas_ativas()
+        corridas = listar_corridas_ativas()
 
         frame = LobbyView(
             self.root,
             self.usuario_logado,
+            corridas,
             self.logout,
             self.mostrar_configuracoes,
             self.mostrar_banco,
             self.mostrar_corrida,
-            self.corridas
+            self.mostrar_criar_corrida
         )
 
         self.trocar_frame(frame)
@@ -186,3 +202,36 @@ class AppController:
         self.usuario_logado = None
 
         self.mostrar_login()
+        
+    
+    # =====================================================
+    # CRIAR CORRIDA
+    # =====================================================
+
+    def mostrar_criar_corrida(self):
+
+        pistas = listar_pistas()
+
+        cavalos = listar_cavalos()
+
+        frame = CriarCorridaView(
+            self.root,
+            pistas,
+            cavalos,
+            self.salvar_corrida,
+            self.mostrar_lobby
+        )
+
+        self.trocar_frame(frame)
+
+
+    def salvar_corrida(self, dados):
+
+        criar_corrida(dados)
+
+        messagebox.showinfo(
+            "Sucesso",
+            "Corrida criada!"
+        )
+
+        self.mostrar_lobby()

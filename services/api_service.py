@@ -34,3 +34,32 @@ def listar_corridas_finalizadas():
     )
 
     return response.json()
+
+
+
+def listar_pistas():
+
+    response = requests.get(
+        f"{API_URL}/pistas/"
+    )
+
+    return response.json()
+
+
+def listar_cavalos():
+
+    response = requests.get(
+        f"{API_URL}/cavalos/"
+    )
+
+    return response.json()
+
+
+def criar_corrida(dados):
+
+    response = requests.post(
+        f"{API_URL}/corridas/",
+        json=dados
+    )
+
+    return response.json()

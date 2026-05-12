@@ -4,21 +4,22 @@ import tkinter as tk
 class LobbyView(tk.Frame):
 
     def __init__(
-    self,
-    master,
-    usuario,
-    logout_callback,
-    config_callback,
-    banco_callback,
-    corrida_callback,
-    corridas
-):
+        self,
+        master,
+        usuario,
+        corridas,
+        logout_callback,
+        config_callback,
+        banco_callback,
+        corrida_callback,
+        criar_corrida_callback
+    ):
 
         super().__init__(master)
 
         tk.Label(
             self,
-            text=f"Bem-vindo a CarlinhosBET",
+            text="CarlinhosBET",
             font=("Arial", 24, "bold")
         ).pack(pady=20)
 
@@ -28,16 +29,36 @@ class LobbyView(tk.Frame):
             font=("Arial", 18)
         ).pack(pady=10)
 
+        tk.Label(
+            self,
+            text="Corridas Ativas",
+            font=("Arial", 16, "bold")
+        ).pack(pady=10)
+
         for corrida in corridas:
+
+            texto = (
+                f"{corrida['nome']} | "
+                f"{corrida['pista']['nome']} | "
+                f"{corrida['status']}"
+            )
 
             tk.Button(
                 self,
-                text=f"{corrida['nome']} - {corrida['pista']['distancia']}km",
-                width=30,
+                text=texto,
+                width=50,
                 height=2,
                 command=lambda c=corrida:
                     corrida_callback(c["_id"])
             ).pack(pady=5)
+
+        tk.Button(
+            self,
+            text="Criar Corrida",
+            width=30,
+            height=2,
+            command=criar_corrida_callback
+        ).pack(pady=15)
 
         tk.Button(
             self,
