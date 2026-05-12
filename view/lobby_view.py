@@ -4,14 +4,15 @@ import tkinter as tk
 class LobbyView(tk.Frame):
 
     def __init__(
-        self,
-        master,
-        usuario,
-        logout_callback,
-        config_callback,
-        banco_callback,
-        corrida_callback
-    ):
+    self,
+    master,
+    usuario,
+    logout_callback,
+    config_callback,
+    banco_callback,
+    corrida_callback,
+    corridas
+):
 
         super().__init__(master)
 
@@ -27,29 +28,16 @@ class LobbyView(tk.Frame):
             font=("Arial", 18)
         ).pack(pady=10)
 
-        tk.Button(
-            self,
-            text="Corrida 1",
-            width=30,
-            height=2,
-            command=lambda: corrida_callback(1)
-        ).pack(pady=5)
+        for corrida in corridas:
 
-        tk.Button(
-            self,
-            text="Corrida 2",
-            width=30,
-            height=2,
-            command=lambda: corrida_callback(2)
-        ).pack(pady=5)
-
-        tk.Button(
-            self,
-            text="Corrida 3",
-            width=30,
-            height=2,
-            command=lambda: corrida_callback(3)
-        ).pack(pady=5)
+            tk.Button(
+                self,
+                text=f"{corrida['nome']} - {corrida['pista']['distancia']}km",
+                width=30,
+                height=2,
+                command=lambda c=corrida:
+                    corrida_callback(c["_id"])
+            ).pack(pady=5)
 
         tk.Button(
             self,

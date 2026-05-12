@@ -7,7 +7,7 @@ class CorridaView(tk.Frame):
     def __init__(
         self,
         master,
-        numero,
+        corrida,
         usuario,
         aposta_callback,
         voltar_callback,
@@ -17,28 +17,36 @@ class CorridaView(tk.Frame):
 
         tk.Label(
             self,
-            text=f"Corrida {numero}",
+            text=corrida["nome"],
             font=("Arial", 24, "bold")
         ).pack(pady=20)
 
-        cavalos = [
-            "Filho da puta",
-            "Black Nigger",
-            "Golden Shower",
-            "Silver Chariot",
-            "Night Gunner"
-        ]
+        pista = corrida["pista"]
 
-        self.cavalo = tk.StringVar(value=cavalos[0])
+        tk.Label(
+            self,
+            text=f"""
+Pista: {pista['nome']}
+Tipo: {pista['tipo']}
+Distância: {pista['distancia']} km
+            """
+        ).pack(pady=10)
 
-        for cavalo in cavalos:
+
+        self.cavalo = tk.StringVar()
+
+        for cavalo in corrida["cavalos"]:
 
             tk.Radiobutton(
                 self,
-                text=cavalo,
+                text=f"""
+{cavalo['nome']}
+Velocidade Média: {cavalo['estatisticas']['velocidade_media']}
+Resistência: {cavalo['estatisticas']['resistencia']}
+                """,
                 variable=self.cavalo,
-                value=cavalo
-            ).pack(anchor="w", padx=250)
+                value=cavalo["nome"]
+            ).pack(anchor="w", padx=80)
 
         tk.Label(
             self,
@@ -77,6 +85,9 @@ class CorridaView(tk.Frame):
                     "Aposta",
                     f"""
 Aposta realizada!
+
+Corrida:
+{corrida['nome']}
 
 Cavalo:
 {self.cavalo.get()}

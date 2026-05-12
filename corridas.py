@@ -1,10 +1,40 @@
 from fastapi import APIRouter
 from bson import ObjectId
 
-from database import corridas_collection
+from database import (
+    corridas_collection,
+    pistas_collection,
+    cavalos_collection
+)
 
 router = APIRouter(prefix="/corridas")
 
+def converter_objectid(obj):
+
+    if isinstance(obj, list):
+
+        return [
+            converter_objectid(item)
+            for item in obj
+        ]
+
+    if isinstance(obj, dict):
+
+        novo = {}
+
+        for chave, valor in obj.items():
+
+            if isinstance(valor, ObjectId):
+
+                novo[chave] = str(valor)
+
+            else:
+
+                novo[chave] = converter_objectid(valor)
+
+        return novo
+
+    return obj
 
 @router.get("/")
 def listar_corridas():
@@ -13,23 +43,34 @@ def listar_corridas():
 
     for corrida in corridas_collection.find():
 
-        corrida["_id"] = str(corrida["_id"])
+        pista = pistas_collection.find_one({
+            "_id": corrida["pista_id"]
+        })
 
-        corrida["pista_id"] = str(corrida["pista_id"])
+        if pista:
 
-        corrida["cavalos"] = [
-            str(c) for c in corrida["cavalos"]
-        ]
+            corrida["pista"] = pista
 
-        if "resultado" in corrida:
+        cavalos_formatados = []
 
-            for item in corrida["resultado"]:
+        for cavalo_id in corrida["cavalos"]:
 
-                item["cavalo_id"] = str(item["cavalo_id"])
+            cavalo = cavalos_collection.find_one({
+                "_id": cavalo_id
+            })
 
-        corridas.append(corrida)
+            if cavalo:
+
+                cavalos_formatados.append(cavalo)
+
+        corrida["cavalos"] = cavalos_formatados
+
+        corridas.append(
+            converter_objectid(corrida)
+        )
 
     return corridas
+
 
 
 @router.get("/{id}")
@@ -39,83 +80,63 @@ def buscar_corrida(id: str):
         "_id": ObjectId(id)
     })
 
-    if corrida:
+    if not corrida:
+
+        return {
+            "erro": "Corrida não encontrada"
+        }
+
+    pista = pistas_collection.find_one({
+        "_id": corrida["pista_id"]
+    })
+
+    if pista:
+
+        corrida["pista"] = pista
+
+    cavalos_formatados = []
+
+    for cavalo_id in corrida["cavalos"]:
+
+        cavalo = cavalos_collection.find_one({
+            "_id": cavalo_id
+        })
+
+        if cavalo:
+
+            cavalos_formatados.append(cavalo)
+
+    corrida["cavalos"] = cavalos_formatados
+
+    return converter_objectid(corrida)
+
+@router.get("/ativas")
+def listar_corridas_ativas():
+
+    corridas = []
+
+    for corrida in corridas_collection.find({
+        "status": "ativa"
+    }):
 
         corrida["_id"] = str(corrida["_id"])
 
-        corrida["pista_id"] = str(corrida["pista_id"])
+        corridas.append(corrida)
 
-        corrida["cavalos"] = [
-            str(c) for c in corrida["cavalos"]
-        ]
-
-        if "resultado" in corrida:
-
-            for item in corrida["resultado"]:
-
-                item["cavalo_id"] = str(item["cavalo_id"])
-
-    return corrida
+    return corridas
 
 
-@router.post("/")
-def criar_corrida(corrida: dict):
+@router.get("/finalizadas")
+def listar_corridas_finalizadas():
 
-    corrida["pista_id"] = ObjectId(
-        corrida["pista_id"]
-    )
+    corridas = []
 
-    corrida["cavalos"] = [
-        ObjectId(c)
-        for c in corrida["cavalos"]
-    ]
+    for corrida in corridas_collection.find({
+        "status": "finalizada"
+    }):
 
-    resultado = corridas_collection.insert_one(
-        corrida
-    )
+        corrida["_id"] = str(corrida["_id"])
 
-    return {
-        "id": str(resultado.inserted_id)
-    }
+        corridas.append(corrida)
 
-
-@router.put("/{id}")
-def atualizar_corrida(id: str, corrida: dict):
-
-    if "pista_id" in corrida:
-
-        corrida["pista_id"] = ObjectId(
-            corrida["pista_id"]
-        )
-
-    if "cavalos" in corrida:
-
-        corrida["cavalos"] = [
-            ObjectId(c)
-            for c in corrida["cavalos"]
-        ]
-
-    if "resultado" in corrida:
-
-        for item in corrida["resultado"]:
-
-            item["cavalo_id"] = ObjectId(
-                item["cavalo_id"]
-            )
-
-    corridas_collection.update_one(
-        {"_id": ObjectId(id)},
-        {"$set": corrida}
-    )
-
-    return {"msg": "Corrida atualizada"}
-
-
-@router.delete("/{id}")
-def deletar_corrida(id: str):
-
-    corridas_collection.delete_one({
-        "_id": ObjectId(id)
-    })
-
-    return {"msg": "Corrida deletada"}
+    return corridas

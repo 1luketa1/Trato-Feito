@@ -7,6 +7,10 @@ from view.corrida_view import CorridaView
 from view.banco_view import BancoView
 from view.configuracoes_view import ConfiguracoesView
 
+from tkinter import messagebox
+
+from services.api_service import listar_corridas
+
 
 class AppController:
 
@@ -85,19 +89,22 @@ class AppController:
 
     def mostrar_lobby(self):
 
+        corridas = listar_corridas()
+
         frame = LobbyView(
             self.root,
             self.usuario_logado,
             self.logout,
             self.mostrar_configuracoes,
             self.mostrar_banco,
-            self.mostrar_corrida
+            self.mostrar_corrida,
+            corridas
         )
 
         self.trocar_frame(frame)
 
     # =====================================================
-    # CONFIGURACOES
+    # CONFIGURAÇÕES
     # =====================================================
 
     def mostrar_configuracoes(self):
@@ -128,15 +135,15 @@ class AppController:
             "Configurações salvas!"
         )
 
-    # =====================================================
-    # CORRIDAS
-    # =====================================================
+    def mostrar_corrida(self, corrida_id):
 
-    def mostrar_corrida(self, numero):
+        from services.api_service import buscar_corrida
+
+        corrida = buscar_corrida(corrida_id)
 
         frame = CorridaView(
             self.root,
-            numero,
+            corrida,
             self.usuario_logado,
             self.apostar,
             self.mostrar_lobby,
@@ -148,9 +155,6 @@ class AppController:
 
         self.usuario_logado["saldo"] -= valor
 
-    # =====================================================
-    # BANCO
-    # =====================================================
 
     def mostrar_banco(self):
 
