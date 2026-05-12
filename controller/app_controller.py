@@ -1,4 +1,5 @@
 from model.usuario_model import Usuario
+from services.api_service import listar_corridas_ativas
 
 from view.login_view import LoginView
 from view.cadastro_view import CadastroView
@@ -89,7 +90,7 @@ class AppController:
 
     def mostrar_lobby(self):
 
-        corridas = listar_corridas()
+        self.corridas = listar_corridas_ativas()
 
         frame = LobbyView(
             self.root,
@@ -98,7 +99,7 @@ class AppController:
             self.mostrar_configuracoes,
             self.mostrar_banco,
             self.mostrar_corrida,
-            corridas
+            self.corridas
         )
 
         self.trocar_frame(frame)

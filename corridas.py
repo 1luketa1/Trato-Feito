@@ -72,6 +72,95 @@ def listar_corridas():
     return corridas
 
 
+@router.get("/ativas")
+def listar_corridas_ativas():
+
+    corridas = []
+
+    for corrida in corridas_collection.find({
+        "status": "ativa"
+    }):
+
+        corrida["_id"] = str(corrida["_id"])
+
+        # ==========================================
+        # PISTA
+        # ==========================================
+
+        pista = pistas_collection.find_one({
+            "_id": corrida["pista_id"]
+        })
+
+        if pista:
+
+            pista["_id"] = str(pista["_id"])
+
+            corrida["pista"] = pista
+
+            corrida["pista_id"] = str(
+                corrida["pista_id"]
+            )
+
+        # ==========================================
+        # CAVALOS
+        # ==========================================
+
+        cavalos_formatados = []
+
+        for cavalo_id in corrida["cavalos"]:
+
+            cavalo = cavalos_collection.find_one({
+                "_id": cavalo_id
+            })
+
+            if cavalo:
+
+                cavalo["_id"] = str(cavalo["_id"])
+
+                cavalos_formatados.append(cavalo)
+
+        corrida["cavalos"] = cavalos_formatados
+
+        # ==========================================
+        # RESULTADOS
+        # ==========================================
+
+        if "resultado" in corrida:
+
+            resultados_formatados = []
+
+            for resultado in corrida["resultado"]:
+
+                resultado["cavalo_id"] = str(
+                    resultado["cavalo_id"]
+                )
+
+                resultados_formatados.append(
+                    resultado
+                )
+
+            corrida["resultado"] = resultados_formatados
+
+        corridas.append(corrida)
+
+    return corridas
+
+
+@router.get("/finalizadas")
+def listar_corridas_finalizadas():
+
+    corridas = []
+
+    for corrida in corridas_collection.find({
+        "status": "finalizada"
+    }):
+
+        corrida["_id"] = str(corrida["_id"])
+
+        corridas.append(corrida)
+
+    return corridas
+
 
 @router.get("/{id}")
 def buscar_corrida(id: str):
@@ -109,34 +198,3 @@ def buscar_corrida(id: str):
     corrida["cavalos"] = cavalos_formatados
 
     return converter_objectid(corrida)
-
-@router.get("/ativas")
-def listar_corridas_ativas():
-
-    corridas = []
-
-    for corrida in corridas_collection.find({
-        "status": "ativa"
-    }):
-
-        corrida["_id"] = str(corrida["_id"])
-
-        corridas.append(corrida)
-
-    return corridas
-
-
-@router.get("/finalizadas")
-def listar_corridas_finalizadas():
-
-    corridas = []
-
-    for corrida in corridas_collection.find({
-        "status": "finalizada"
-    }):
-
-        corrida["_id"] = str(corrida["_id"])
-
-        corridas.append(corrida)
-
-    return corridas
