@@ -1,11 +1,17 @@
 # Trato-Feito
 
 pip install neo4j
+
 pip install fastapi
+
 pip install uvicorn
+
 pip install pymongo
+
 pip install requests
+
 pip install python-dotenv
+
 pip install redis
 
 COMANDOS PARA RODAR O PROJETO
