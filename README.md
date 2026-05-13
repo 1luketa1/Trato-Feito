@@ -17,7 +17,16 @@ pip install redis
 COMANDOS PARA RODAR O PROJETO
 
 1. LIGAR O REDIS (Docker)
+   
+baixar o docker
+https://www.docker.com/products/docker-desktop/
 
+tem q estar com o docker baixado e aberto 
+
+Na primeira vez use: 
+docker run -d -p 6379:6379 --name redis-tf redis
+
+Nas outras pode usar :
 docker start redis-tf
 
 Verificar se está rodando:
