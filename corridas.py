@@ -220,3 +220,26 @@ def criar_corrida(corrida: dict):
         "msg": "Corrida criada",
         "id": str(resultado.inserted_id)
     }
+    
+    
+@router.post("/{id}/simular")
+def simular_corrida_api(id: str):
+
+    from services.simulacao_service import simular_corrida
+
+    resultado = simular_corrida(id)
+
+    if not resultado:
+        return {"erro": "Erro na simulação"}
+
+    corridas_collection.update_one(
+        {"_id": ObjectId(id)},
+        {
+            "$set": {
+                "resultado": resultado["resultado"],
+                "status": "finalizada"
+            }
+        }
+    )
+
+    return resultado

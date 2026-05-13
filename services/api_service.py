@@ -63,3 +63,11 @@ def criar_corrida(dados):
     )
 
     return response.json()
+
+def simular_corrida(id):
+
+    response = requests.post(
+        f"{API_URL}/corridas/{id}/simular"
+    )
+
+    return response.json()
