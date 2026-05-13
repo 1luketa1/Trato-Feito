@@ -83,15 +83,24 @@ Resistência: {cavalo['estatisticas']['resistencia']}
         # APOSTAR
         # =====================================================
 
+        # =====================================================
+        # APOSTAR
+        # =====================================================
+
         def apostar():
 
             try:
 
                 if not self.cavalo.get():
-                    messagebox.showerror("Erro", "Selecione um cavalo")
+                    messagebox.showerror(
+                        "Erro",
+                        "Selecione um cavalo"
+                    )
                     return
 
-                valor = float(self.valor.get())
+                valor = float(
+                    self.valor.get()
+                )
 
                 if valor <= 0:
                     raise ValueError
@@ -104,9 +113,21 @@ Resistência: {cavalo['estatisticas']['resistencia']}
                     )
                     return
 
-                aposta_callback(valor)
+                nome_cavalo = self.mapa_cavalos[
+                    self.cavalo.get()
+                ]
 
-                nome_cavalo = self.mapa_cavalos[self.cavalo.get()]
+                odd = odds.get(
+                    self.cavalo.get(),
+                    1.0
+                )
+
+                aposta_callback(
+                    valor,
+                    corrida["nome"],
+                    nome_cavalo,
+                    odd
+                )
 
                 messagebox.showinfo(
                     "Aposta",
@@ -116,6 +137,7 @@ Aposta realizada!
 Corrida: {corrida['nome']}
 Cavalo: {nome_cavalo}
 Valor: R$ {valor:.2f}
+Odd: {odd:.2f}
                     """
                 )
 
@@ -126,7 +148,6 @@ Valor: R$ {valor:.2f}
                     "Erro",
                     "Valor inválido"
                 )
-
         # =====================================================
         # SIMULAR
         # =====================================================

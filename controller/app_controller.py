@@ -10,7 +10,7 @@ from view.banco_view import BancoView
 from view.configuracoes_view import ConfiguracoesView
 from services.redis_service import RedisService
 from tkinter import messagebox
-
+from view.tickets_view import TicketsView
 from services.api_service import listar_corridas
 from view.corridas_finalizadas_view import CorridasFinalizadasView
 from services.api_service import listar_corridas_finalizadas
@@ -111,19 +111,21 @@ class AppController:
         print("Criar corrida clicado")
 
     def mostrar_lobby(self):
-        self.corridas = listar_corridas_ativas()
+
+        corridas = listar_corridas_ativas()
 
         frame = LobbyView(
             self.root,
             self.usuario_logado,
-            self.corridas,
+            corridas,
             self.logout,
             self.mostrar_configuracoes,
             self.mostrar_banco,
             self.mostrar_corrida,
             self.mostrar_criar_corrida,
-            self.mostrar_pesquisa,
-            self.mostrar_corridas_finalizadas
+            self.mostrar_corridas_finalizadas,
+            self.mostrar_tickets,
+            self.mostrar_pesquisa
         )
 
         self.trocar_frame(frame)
@@ -175,9 +177,17 @@ class AppController:
 
         self.trocar_frame(frame)
 
-    def apostar(self, valor):
+    def apostar(
+        self,
+        valor,
+        nome_corrida,
+        nome_cavalo,
+        odd
+    ):
 
-        saldo_atual = float(self.usuario_logado["saldo"])
+        saldo_atual = float(
+            self.usuario_logado["saldo"]
+        )
 
         saldo_atual -= valor
 
@@ -186,6 +196,19 @@ class AppController:
         RedisService.atualizar_saldo(
             self.usuario_logado["id"],
             saldo_atual
+        )
+
+        # salva ticket
+        RedisService.criar_ticket(
+            nome_corrida,
+            nome_cavalo,
+            valor,
+            odd
+        )
+
+        messagebox.showinfo(
+            "Aposta registrada",
+            "Ticket salvo com sucesso!"
         )
 
         self.mostrar_lobby()
@@ -305,3 +328,19 @@ class AppController:
         self.usuario_logado["usuario"],
         texto
     )
+        
+    # =====================================================
+    # TICKETS
+    # =====================================================
+
+    def mostrar_tickets(self):
+
+        tickets = RedisService.listar_tickets()
+
+        frame = TicketsView(
+            self.root,
+            tickets,
+            self.mostrar_lobby
+        )
+
+        self.trocar_frame(frame)

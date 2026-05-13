@@ -129,3 +129,165 @@ class RedisService:
 
         except FileNotFoundError:
             pass
+
+
+        # =====================================================
+    # CRIAR TICKET
+    # =====================================================
+
+    @staticmethod
+    def criar_ticket(
+        nome_corrida,
+        nome_cavalo,
+        valor_pago,
+        odd
+    ):
+
+        ticket_id = r.incr(
+            "proximoTicketId"
+        )
+
+        r.hset(
+            f"ticket:{ticket_id}",
+            mapping={
+                "id": ticket_id,
+                "nome_corrida": nome_corrida,
+                "nome_cavalo": nome_cavalo,
+                "valor_pago": valor_pago,
+                "odd": odd
+            }
+        )
+
+        RedisService.salvar_tickets_json()
+
+        return ticket_id
+
+
+    # =====================================================
+    # BUSCAR UM TICKET
+    # =====================================================
+
+    @staticmethod
+    def buscar_ticket(
+        ticket_id
+    ):
+
+        chave = f"ticket:{ticket_id}"
+
+        if not r.exists(chave):
+            return None
+
+        return r.hgetall(
+            chave
+        )
+
+
+    # =====================================================
+    # LISTAR TODOS OS TICKETS
+    # =====================================================
+
+    @staticmethod
+    def listar_tickets():
+
+        tickets = []
+
+        for chave in r.keys(
+            "ticket:*"
+        ):
+
+            dados = r.hgetall(
+                chave
+            )
+
+            tickets.append(
+                dados
+            )
+
+        return tickets
+
+
+    # =====================================================
+    # ATUALIZAR TICKET
+    # =====================================================
+
+    @staticmethod
+    def atualizar_ticket(
+        ticket_id,
+        novos_dados
+    ):
+
+        chave = f"ticket:{ticket_id}"
+
+        if not r.exists(
+            chave
+        ):
+            return False
+
+        r.hset(
+            chave,
+            mapping=novos_dados
+        )
+
+        RedisService.salvar_tickets_json()
+
+        return True
+
+
+    # =====================================================
+    # DELETAR TICKET
+    # =====================================================
+
+    @staticmethod
+    def deletar_ticket(
+        ticket_id
+    ):
+
+        chave = f"ticket:{ticket_id}"
+
+        if not r.exists(
+            chave
+        ):
+            return False
+
+        r.delete(
+            chave
+        )
+        RedisService.salvar_tickets_json()
+
+        return True
+    
+        # =====================================================
+    # SALVAR TICKETS EM JSON
+    # =====================================================
+
+    @staticmethod
+    def salvar_tickets_json():
+
+        tickets = []
+
+        for chave in r.keys("ticket:*"):
+
+            dados = r.hgetall(chave)
+
+            ticket_limpo = {
+                "id": dados["id"],
+                "nome_corrida": dados["nome_corrida"],
+                "nome_cavalo": dados["nome_cavalo"],
+                "valor_pago": dados["valor_pago"],
+                "odd": dados["odd"]
+            }
+
+            tickets.append(ticket_limpo)
+
+        with open(
+            "tickets.json",
+            "w",
+            encoding="utf-8"
+        ) as arquivo:
+
+            json.dump(
+                tickets,
+                arquivo,
+                indent=4,
+                ensure_ascii=False
+            )

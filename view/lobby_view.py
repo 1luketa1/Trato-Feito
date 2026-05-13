@@ -13,8 +13,9 @@ class LobbyView(tk.Frame):
         banco_callback,
         corrida_callback,
         criar_corrida_callback,
-        pesquisa_callback,
-        mostrar_corridas_finalizadas_callback   
+        mostrar_corridas_finalizadas_callback,
+        tickets_callback,
+        pesquisa_callback
     ):
 
         super().__init__(master)
@@ -92,6 +93,18 @@ class LobbyView(tk.Frame):
             height=2,
             command=logout_callback
         ).pack(pady=20)
+
+        tk.Button(
+            self,
+            text="🎫",
+            font=("Arial", 18),
+            width=3,
+            height=1,
+            command=tickets_callback
+        ).place(
+            relx=0.88,
+            rely=0.72
+        )
 
         tk.Button(
             self,
