@@ -11,6 +11,8 @@ from view.configuracoes_view import ConfiguracoesView
 from tkinter import messagebox
 
 from services.api_service import listar_corridas
+from view.corridas_finalizadas_view import CorridasFinalizadasView
+from services.api_service import listar_corridas_finalizadas
 
 
 from view.criar_corrida_view import CriarCorridaView
@@ -105,19 +107,19 @@ class AppController:
         print("Criar corrida clicado")
 
     def mostrar_lobby(self):
-
-        corridas = listar_corridas_ativas()
+        self.corridas = listar_corridas_ativas()
 
         frame = LobbyView(
             self.root,
             self.usuario_logado,
-            corridas,
+            self.corridas,
             self.logout,
             self.mostrar_configuracoes,
             self.mostrar_banco,
             self.mostrar_corrida,
             self.mostrar_criar_corrida,
-            self.mostrar_pesquisa
+            self.mostrar_pesquisa,
+            self.mostrar_corridas_finalizadas
         )
 
         self.trocar_frame(frame)
@@ -221,6 +223,18 @@ class AppController:
             pistas,
             cavalos,
             self.salvar_corrida,
+            self.mostrar_lobby
+        )
+
+        self.trocar_frame(frame)
+        
+    def mostrar_corridas_finalizadas(self):
+
+        corridas = listar_corridas_finalizadas()
+
+        frame = CorridasFinalizadasView(
+            self.root,
+            corridas,
             self.mostrar_lobby
         )
 

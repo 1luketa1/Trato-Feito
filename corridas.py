@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from bson import ObjectId
 from datetime import datetime
+from copy import deepcopy
 
 from database import (
     corridas_collection,
@@ -36,6 +37,17 @@ def converter_objectid(obj):
         return novo
 
     return obj
+
+
+def serialize_mongo(doc):
+    if isinstance(doc, list):
+        return [serialize_mongo(item) for item in doc]
+    elif isinstance(doc, dict):
+        return {k: serialize_mongo(v) for k, v in doc.items()}
+    elif isinstance(doc, ObjectId):
+        return str(doc)
+    else:
+        return doc
 
 @router.get("/")
 def listar_corridas():
@@ -138,21 +150,56 @@ def listar_corridas_ativas():
 
     return corridas
 
-
 @router.get("/finalizadas")
 def listar_corridas_finalizadas():
 
     corridas = []
 
-    for corrida in corridas_collection.find({
-        "status": "finalizada"
-    }):
+    for corrida in corridas_collection.find({"status": "finalizada"}):
 
-        corrida["_id"] = str(corrida["_id"])
+        # =========================
+        # PISTA
+        # =========================
+        pista = pistas_collection.find_one({
+            "_id": corrida["pista_id"]
+        })
+
+        if pista:
+            corrida["pista"] = pista
+
+        # =========================
+        # CAVALOS
+        # =========================
+        cavalos_formatados = []
+
+        for cavalo_id in corrida.get("cavalos", []):
+            cavalo = cavalos_collection.find_one({
+                "_id": cavalo_id
+            })
+
+            if cavalo:
+                cavalos_formatados.append(cavalo)
+
+        corrida["cavalos"] = cavalos_formatados
+
+        # =========================
+        # RESULTADO
+        # =========================
+        resultados_formatados = []
+
+        for resultado in corrida.get("resultado", []):
+            resultados_formatados.append({
+                "cavalo_id": resultado["cavalo_id"],
+                "posicao": resultado["posicao"],
+                "tempo": resultado["tempo"]
+            })
+
+        corrida["resultado"] = resultados_formatados
 
         corridas.append(corrida)
 
-    return corridas
+    # 🔥 CONVERSÃO GLOBAL FINAL (resolve 100% dos ObjectId)
+    return serialize_mongo(corridas)
 
 
 @router.get("/{id}")
@@ -243,3 +290,6 @@ def simular_corrida_api(id: str):
     )
 
     return resultado
+
+
+

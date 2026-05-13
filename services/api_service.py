@@ -6,7 +6,6 @@ API_URL = "http://127.0.0.1:8000"
 def listar_corridas():
 
     response = requests.get(f"{API_URL}/corridas/")
-
     return response.json()
 
 
@@ -17,6 +16,7 @@ def buscar_corrida(corrida_id):
     )
 
     return response.json()
+
 
 def listar_corridas_ativas():
 
@@ -34,7 +34,6 @@ def listar_corridas_finalizadas():
     )
 
     return response.json()
-
 
 
 def listar_pistas():
@@ -64,10 +63,11 @@ def criar_corrida(dados):
 
     return response.json()
 
-def simular_corrida(id):
+
+def simular_corrida(corrida_id):
 
     response = requests.post(
-        f"{API_URL}/corridas/{id}/simular"
+        f"{API_URL}/corridas/{corrida_id}/simular"
     )
 
     return response.json()
