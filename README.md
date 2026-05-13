@@ -48,3 +48,5 @@ Uvicorn running on http://127.0.0.1:8000
 Em outro terminal:
 
 python main.py
+
+4. PRECISA DO .env PRA RODAR 
