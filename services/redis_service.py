@@ -263,6 +263,7 @@ class RedisService:
     @staticmethod
     def salvar_tickets_json():
 
+        print("🔥 tentando salvar tickets")
         tickets = []
 
         for chave in r.keys("ticket:*"):

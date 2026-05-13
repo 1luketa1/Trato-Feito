@@ -112,6 +112,7 @@ class AppController:
         print("Criar corrida clicado")
 
     def mostrar_lobby(self):
+        self.corridas = listar_corridas_ativas()
 
         corridas = listar_corridas_ativas()
 

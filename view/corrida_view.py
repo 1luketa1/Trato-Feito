@@ -129,6 +129,8 @@ Resistência: {cavalo['estatisticas']['resistencia']}
                     odd
                 )
 
+                nome_cavalo = self.mapa_cavalos[self.cavalo.get()]
+
                 messagebox.showinfo(
                     "Aposta",
                     f"""
@@ -148,6 +150,53 @@ Odd: {odd:.2f}
                     "Erro",
                     "Valor inválido"
                 )
+        # =====================================================
+        # SIMULAR
+        # =====================================================
+
+        def simular():
+
+            resultado = simular_corrida(corrida["_id"])
+
+            if not resultado or "erro" in resultado:
+
+                messagebox.showerror(
+                    "Erro",
+                    "Falha na simulação"
+                )
+                return
+
+            vencedor_id = resultado["vencedor"]
+            nome_vencedor = self.mapa_cavalos.get(
+                vencedor_id,
+                vencedor_id
+            )
+
+            texto_resultado = f"🏆 Vencedor: {nome_vencedor}\n\n"
+
+            for r in resultado["resultado"]:
+
+                nome = self.mapa_cavalos.get(
+                    r["cavalo_id"],
+                    r["cavalo_id"]
+                )
+
+                texto_resultado += (
+                    f"{r['posicao']}º - {nome} "
+                    f"({r['tempo']}s)\n"
+                )
+
+            messagebox.showinfo(
+                "Resultado da Corrida",
+                texto_resultado
+            )
+
+            voltar_callback()
+
+        # =====================================================
+        # BOTÕES
+        # =====================================================
+
         # =====================================================
         # SIMULAR
         # =====================================================
