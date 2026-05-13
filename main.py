@@ -1,12 +1,5 @@
 import Services.NeoService as neo
 from datetime import datetime
-from fastapi import FastAPI
-
-app = FastAPI()
-
-@app.get("/")
-def home():
-    return {"msg": "API funcionando"}
 
 '''
 neo.CreatePerson("Carlinhos, O ultimo domador de cavalos", "TestPer1")
@@ -21,7 +14,7 @@ neo.CreateViewedHorseRelation("TestPer1", "TestHor1")
 neo.CreateFavoriteHorseRelation("TestPer1", "TestHor1")
 neo.CreateViewedTrackRelation("TestPer1", "TestTra1")
 neo.CreateFavoriteTrackRelation("TestPer1", "TestTra1")
-neo.CreateTicket(2050.00, "TestPer1", "TestRun1", "TestTic1")
+neo.CreateTicket(2050.00, "TestPer1", "TestRun1", "TestHor1", "TestTic1")
 
 print(neo.ReadPerson("TestPer1"))
 print(neo.ReadTrack("TestTra1"))

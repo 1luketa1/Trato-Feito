@@ -1,5 +1,6 @@
 import json
 from neo4j import GraphDatabase 
+from datetime import datetime
 
 with open("InvisibleKeys/NeoKey.json", "r") as arc:
     NeoKey = json.load(arc)
@@ -20,20 +21,39 @@ def CreatePerson(name, dBAcessKey):
     with driver.session() as session:
         session.run(query, name=name, dBAcessKey=dBAcessKey)
 
-def CreateTicket(value, buyerDBAcessKey, runDBAcessKey, dBAcessKey):
+def CreateTicket(value, buyerDBAcessKey, runDBAcessKey, horseBetDBAcessKey, dBAcessKey):
+    
+    '''
+    FUTURE OPTIMIZATION:
+
+    (Person)-[:PlacedBetOn {times}]->(Horse)
+    (Person)-[:BetOnTrack {times}]->(Track)
+    '''
 
     query = """
-    MATCH (p:Person {dBAcessKey:$buyerDBAcessKey})
+    MATCH (p:Person {
+        dBAcessKey:$buyerDBAcessKey
+    })
 
-    MATCH (r:Run {dBAcessKey:$runDBAcessKey})
+    MATCH (r:Run {
+        dBAcessKey:$runDBAcessKey
+    })
+
+    MATCH (h:Horse {
+        dBAcessKey:$horseBetDBAcessKey
+    })
 
     MERGE (t:Ticket {
-        value:$value,
         dBAcessKey:$dBAcessKey
     })
 
+    SET t.value = $value
+
     MERGE (p)-[:Bought]->(t)
-    MERGE (t)-[:GamblesOn]->(r)
+
+    MERGE (t)-[:References]->(r)
+
+    MERGE (t)-[:BetsOn]->(h)
     """
 
     with driver.session() as session:
@@ -43,6 +63,7 @@ def CreateTicket(value, buyerDBAcessKey, runDBAcessKey, dBAcessKey):
             value=value,
             buyerDBAcessKey=buyerDBAcessKey,
             runDBAcessKey=runDBAcessKey,
+            horseBetDBAcessKey=horseBetDBAcessKey,
             dBAcessKey=dBAcessKey
         )
 
@@ -639,3 +660,60 @@ def ReadRun(dBAcessKey):
 # =========================
 #          Filter  
 # ========================= 
+
+def FilterByAllMostViewedRuns():
+
+    query = """
+    MATCH (:Person)-[:Viewed]->(r:Run)
+
+    RETURN
+        r,
+        count(*) AS views
+
+    ORDER BY views DESC
+    """
+
+    with driver.session() as session:
+
+        result = session.run(query)
+
+        data = []
+
+        for record in result:
+
+            data.append({
+                "dBAcessKey": record["dBAcessKey"],
+                "date": record["date"],
+                "views": record["views"]
+            })
+
+        return data
+
+def FilterByMostViewedOpenRuns():
+    
+    query = """
+    MATCH (:Person)-[:Viewed]->(r:Run)
+    WHERE r.date > $CurrentDate
+
+    RETURN 
+        r,
+        count(*) AS views
+
+    ORDER BY views DESC
+    """
+
+    with driver.session() as session:
+
+        BDData = session.run(query)
+
+        data = []
+
+        for bDData in BDData:
+
+            data.append({
+                "dBAcessKey": bDData["dBAcessKey"],
+                "date": bDData["date"],
+                "views": bDData["views"]
+            })
+
+        return data
