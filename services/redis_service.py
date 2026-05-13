@@ -291,3 +291,47 @@ class RedisService:
                 indent=4,
                 ensure_ascii=False
             )
+
+    @staticmethod
+    def carregar_tickets_json():
+
+        import os
+        import json
+
+        if not os.path.exists("tickets.json"):
+            return
+
+        with open(
+            "tickets.json",
+            "r",
+            encoding="utf-8"
+        ) as arquivo:
+
+            tickets = json.load(
+                arquivo
+            )
+
+        # evita duplicar se já estiver no redis
+        if r.exists("proximoTicketId"):
+            return
+
+        maior_id = 0
+
+        for ticket in tickets:
+
+            ticket_id = int(
+                ticket["id"]
+            )
+
+            r.hset(
+                f"ticket:{ticket_id}",
+                mapping=ticket
+            )
+
+            if ticket_id > maior_id:
+                maior_id = ticket_id
+
+        r.set(
+            "proximoTicketId",
+            maior_id
+        )           

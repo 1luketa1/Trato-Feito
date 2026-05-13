@@ -42,6 +42,7 @@ class AppController:
 
         self.usuario_logado = None
         RedisService.carregar_json()
+        RedisService.carregar_tickets_json()
         self.mostrar_login()
 
     # =====================================================
