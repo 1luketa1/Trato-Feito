@@ -4,55 +4,52 @@ from tkinter import messagebox
 
 class CadastroView(tk.Frame):
 
-    def __init__(self, master, voltar_callback):
-
+    def __init__(self, master, cadastro_callback, voltar_callback):
         super().__init__(master)
 
-        tk.Label(
-            self,
-            text="Cadastro",
-            font=("Arial", 24, "bold")
-        ).pack(pady=30)
+        tk.Label(self, text="Cadastro", font=("Arial", 24, "bold")).pack(pady=20)
 
+        # USUÁRIO
         tk.Label(self, text="Usuário").pack()
+        self.user = tk.Entry(self, width=30)
+        self.user.pack(pady=5)
 
-        self.user = tk.Entry(self)
-        self.user.pack()
-
+        # SENHA
         tk.Label(self, text="Senha").pack()
+        self.senha = tk.Entry(self, show="*", width=30)
+        self.senha.pack(pady=5)
 
-        self.senha = tk.Entry(self, show="*")
-        self.senha.pack()
+        # CONFIRMAR SENHA
+        tk.Label(self, text="Confirmar Senha").pack()
+        self.confirmar = tk.Entry(self, show="*", width=30)
+        self.confirmar.pack(pady=5)
 
-        tk.Label(self, text="Confirmar senha").pack()
-
-        self.confirmar = tk.Entry(self, show="*")
-        self.confirmar.pack()
-
+        # FUNÇÃO CADASTRAR
         def cadastrar():
 
-            if self.senha.get() != self.confirmar.get():
+            usuario = self.user.get()
+            senha = self.senha.get()
+            confirmar = self.confirmar.get()
 
-                messagebox.showerror(
-                    "Erro",
-                    "As senhas não coincidem"
-                )
-
+            if usuario == "" or senha == "":
+                messagebox.showerror("Erro", "Preencha todos os campos")
                 return
 
-            messagebox.showinfo(
-                "Cadastro",
-                "Usuário cadastrado!"
-            )
+            if senha != confirmar:
+                messagebox.showerror("Erro", "As senhas não coincidem")
+                return
 
-            voltar_callback()
+            print("BOTÃO FOI CLICADO")
 
+            cadastro_callback(usuario, senha)
+
+        # BOTÕES
         tk.Button(
             self,
             text="Cadastrar",
             width=20,
             command=cadastrar
-        ).pack(pady=15)
+        ).pack(pady=20)
 
         tk.Button(
             self,
