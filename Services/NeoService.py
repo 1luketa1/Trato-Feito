@@ -178,7 +178,11 @@ def CreateViewedHorseRelation(personDBAcessKey, horseDBAcessKey):
         dBAcessKey:$horseDBAcessKey
     })
 
-    MERGE (p)-[:Viewed]->(h)
+    MERGE (p)-[v:Viewed]->(h)
+
+    ON CREATE SET v.times = 1
+
+    ON MATCH SET v.times = v.times + 1
     """
 
     with driver.session() as session:
@@ -224,7 +228,11 @@ def CreateViewedRunRelation(personDBAcessKey, runDBAcessKey):
         dBAcessKey:$runDBAcessKey
     })
 
-    MERGE (p)-[:Viewed]->(r)
+    MERGE (p)-[v:Viewed]->(r)
+
+    ON CREATE SET v.times = 1
+
+    ON MATCH SET v.times = v.times + 1
     """
 
     with driver.session() as session:
@@ -270,7 +278,11 @@ def CreateViewedTrackRelation(personDBAcessKey, trackDBAcessKey):
         dBAcessKey:$trackDBAcessKey
     })
 
-    MERGE (p)-[:Viewed]->(t)
+    MERGE (p)-[v:Viewed]->(t)
+
+    ON CREATE SET v.times = 1
+
+    ON MATCH SET v.times = v.times + 1
     """
 
     with driver.session() as session:
@@ -658,62 +670,628 @@ def ReadRun(dBAcessKey):
 
 
 # =========================
-#          Filter  
-# ========================= 
+#          Filter
+# =========================
 
-def FilterByAllMostViewedRuns():
+'''
+IDEAS
+
+Tracks a horse likes
+
+'''
+
+# ===========
+# PersonHorse
+# ===========
+
+def FilterByPersonFavoriteHorses(personDBAcessKey, limit):
 
     query = """
-    MATCH (:Person)-[:Viewed]->(r:Run)
+    MATCH (p:Person {
+        dBAcessKey:$personDBAcessKey
+    })-[:Favorited]->(h:Horse)
 
-    RETURN
-        r,
-        count(*) AS views
+    RETURN h
 
-    ORDER BY views DESC
+    LIMIT $limit
     """
 
     with driver.session() as session:
 
-        result = session.run(query)
+        result = session.run(
+            query,
+            personDBAcessKey=personDBAcessKey,
+            limit=limit
+        )
 
-        data = []
+        return [
+            {
+                "horse": dict(data["h"])
+            }
+            for data in result
+        ]
 
-        for record in result:
 
-            data.append({
-                "dBAcessKey": record["dBAcessKey"],
-                "date": record["date"],
-                "views": record["views"]
-            })
+def FilterByPersonMostViewedHorses(personDBAcessKey, limit):
 
-        return data
+    query = """
+    MATCH (p:Person {
+        dBAcessKey:$personDBAcessKey
+    })-[v:Viewed]->(h:Horse)
 
-def FilterByMostViewedOpenRuns():
+    RETURN h, sum(v.times) AS views
+
+    ORDER BY views DESC
+
+    LIMIT $limit
+    """
+
+    with driver.session() as session:
+
+        result = session.run(
+            query,
+            personDBAcessKey=personDBAcessKey,
+            limit=limit
+        )
+
+        return [
+            {
+                "horse": dict(data["h"]),
+                "views": data["views"]
+            }
+            for data in result
+        ]
+
+
+# ===========
+# PersonTrack
+# ===========
+
+def FilterByPersonFavoriteTracks(personDBAcessKey, limit):
+
+    query = """
+    MATCH (p:Person {
+        dBAcessKey:$personDBAcessKey
+    })-[:Favorited]->(t:Track)
+
+    RETURN t
+
+    LIMIT $limit
+    """
+
+    with driver.session() as session:
+
+        result = session.run(
+            query,
+            personDBAcessKey=personDBAcessKey,
+            limit=limit
+        )
+
+        return [
+            {
+                "track": dict(data["t"])
+            }
+            for data in result
+        ]
+
+
+def FilterByPersonMostViewedTracks(personDBAcessKey, limit):
+
+    query = """
+    MATCH (p:Person {
+        dBAcessKey:$personDBAcessKey
+    })-[v:Viewed]->(t:Track)
+
+    RETURN t, sum(v.times) AS views
+
+    ORDER BY views DESC
+
+    LIMIT $limit
+    """
+
+    with driver.session() as session:
+
+        result = session.run(
+            query,
+            personDBAcessKey=personDBAcessKey,
+            limit=limit
+        )
+
+        return [
+            {
+                "track": dict(data["t"]),
+                "views": data["views"]
+            }
+            for data in result
+        ]
+
+
+# ===========
+# AllTimeRuns
+# ===========
+
+def FilterByRunsHorseIsIn(horseDBAcessKey, limit):
+
+    query = """
+    MATCH (h:Horse {
+        dBAcessKey:$horseDBAcessKey
+    })-[:RacesIn]->(r:Run)
+
+    RETURN r
+
+    ORDER BY r.date ASC
+
+    LIMIT $limit
+    """
+
+    with driver.session() as session:
+
+        result = session.run(
+            query,
+            horseDBAcessKey=horseDBAcessKey,
+            limit=limit
+        )
+
+        return [
+            {
+                "run": dict(data["r"])
+            }
+            for data in result
+        ]
+
+
+def FilterByAllRunsTrackIsIn(trackDBAcessKey, limit):
+
+    query = """
+    MATCH (r:Run)-[:OccursAt]->(t:Track {
+        dBAcessKey:$trackDBAcessKey
+    })
+
+    RETURN r
+
+    ORDER BY r.date ASC
+
+    LIMIT $limit
+    """
+
+    with driver.session() as session:
+
+        result = session.run(
+            query,
+            trackDBAcessKey=trackDBAcessKey,
+            limit=limit
+        )
+
+        return [
+            {
+                "run": dict(data["r"])
+            }
+            for data in result
+        ]
+
+
+def FilterByMostViewedOpenRuns(limit):
+
+    query = """
+    MATCH (:Person)-[v:Viewed]->(r:Run)
+
+    WHERE r.date > datetime()
+
+    RETURN r, sum(v.times) AS views
+
+    ORDER BY views DESC
+
+    LIMIT $limit
+    """
+
+    with driver.session() as session:
+
+        result = session.run(
+            query,
+            limit=limit
+        )
+
+        return [
+            {
+                "run": dict(data["r"]),
+                "views": data["views"]
+            }
+            for data in result
+        ]
+
+
+def FilterByAllMostBuyedRuns(limit):
+
+    query = """
+    MATCH (:Person)-[:Bought]->(:Ticket)-[:References]->(r:Run)
+
+    RETURN r, count(*) AS buys
+
+    ORDER BY buys DESC
+
+    LIMIT $limit
+    """
+
+    with driver.session() as session:
+
+        result = session.run(
+            query,
+            limit=limit
+        )
+
+        return [
+            {
+                "run": dict(data["r"]),
+                "buys": data["buys"]
+            }
+            for data in result
+        ]
+
+
+def FilterByPersonMostViewedTracksAllRuns(personDBAcessKey, limit):
+
+    query = """
+    MATCH (p:Person {
+        dBAcessKey:$personDBAcessKey
+    })-[v:Viewed]->(t:Track)<-[:OccursAt]-(r:Run)
     
-    query = """
-    MATCH (:Person)-[:Viewed]->(r:Run)
-    WHERE r.date > $CurrentDate
-
-    RETURN 
-        r,
-        count(*) AS views
+    RETURN r, sum(v.times) AS views
 
     ORDER BY views DESC
+
+    LIMIT $limit
     """
 
     with driver.session() as session:
 
-        BDData = session.run(query)
+        result = session.run(
+            query,
+            personDBAcessKey=personDBAcessKey,
+            limit=limit
+        )
 
-        data = []
+        return [
+            {
+                "run": dict(data["r"]),
+                "views": data["views"]
+            }
+            for data in result
+        ]
 
-        for bDData in BDData:
 
-            data.append({
-                "dBAcessKey": bDData["dBAcessKey"],
-                "date": bDData["date"],
-                "views": bDData["views"]
-            })
+def FilterByPersonFavoriteTracksAllRuns(personDBAcessKey, limit):
 
-        return data
+    query = """
+    MATCH (p:Person { dBAcessKey:$personDBAcessKey
+    })-[:Favorited]->(t:Track)<-[:OccursAt]-(r:Run)
+
+    RETURN r
+
+    LIMIT $limit
+    """
+
+    with driver.session() as session:
+
+        result = session.run(
+            query,
+            personDBAcessKey=personDBAcessKey,
+            limit=limit
+        )
+
+        return [
+            {
+                "run": dict(data["r"])
+            }
+            for data in result
+        ]
+
+
+def FilterByPersonMostViewedHorsesAllRuns(personDBAcessKey, limit):
+
+    query = """
+    MATCH (p:Person {
+        dBAcessKey:$personDBAcessKey
+    })-[v:Viewed]->(h:Horse)-[:RacesIn]->(r:Run)
+
+    RETURN r, sum(v.times) AS views
+
+    ORDER BY views DESC
+
+    LIMIT $limit
+    """
+
+    with driver.session() as session:
+
+        result = session.run(
+            query,
+            personDBAcessKey=personDBAcessKey,
+            limit=limit
+        )
+
+        return [
+            {
+                "run": dict(data["r"]),
+                "views": data["views"]
+            }
+            for data in result
+        ]
+
+
+def FilterByPersonFavoriteHorsesAllRuns(personDBAcessKey, limit):
+
+    query = """
+    MATCH (p:Person {
+        dBAcessKey:$personDBAcessKey
+    })-[:Favorited]->(h:Horse)-[:RacesIn]->(r:Run)
+
+    RETURN r
+
+    LIMIT $limit
+    """
+
+    with driver.session() as session:
+
+        result = session.run(
+            query,
+            personDBAcessKey=personDBAcessKey,
+            limit=limit
+        )
+
+        return [
+            {
+                "run": dict(data["r"])
+            }
+            for data in result
+        ]
+
+
+# =========
+# OpenRuns
+# =========
+
+def FilterByOpenRunsHorseIsIn(horseDBAcessKey, limit):
+
+    query = """
+    MATCH (h:Horse {
+        dBAcessKey:$horseDBAcessKey
+    })-[:RacesIn]->(r:Run)
+
+    WHERE r.date > datetime()
+
+    RETURN r
+
+    ORDER BY r.date ASC
+
+    LIMIT $limit
+    """
+
+    with driver.session() as session:
+
+        result = session.run(
+            query,
+            horseDBAcessKey=horseDBAcessKey,
+            limit=limit
+        )
+
+        return [
+            {
+                "run": dict(data["r"])
+            }
+            for data in result
+        ]
+
+
+def FilterByOpenRunsTrackIsIn(trackDBAcessKey, limit):
+
+    query = """
+    MATCH (r:Run)-[:OccursAt]->(t:Track {
+        dBAcessKey:$trackDBAcessKey
+    })
+
+    WHERE r.date > datetime()
+
+    RETURN r
+
+    ORDER BY r.date ASC
+
+    LIMIT $limit
+    """
+
+    with driver.session() as session:
+
+        result = session.run(
+            query,
+            trackDBAcessKey=trackDBAcessKey,
+            limit=limit
+        )
+
+        return [
+            {
+                "run": dict(data["r"])
+            }
+            for data in result
+        ]
+
+
+def FilterByAllMostViewedRuns(limit):
+
+    query = """
+    MATCH (:Person)-[v:Viewed]->(r:Run)
+
+    RETURN r, sum(v.times) AS views
+
+    ORDER BY views DESC
+
+    LIMIT $limit
+    """
+
+    with driver.session() as session:
+
+        result = session.run(
+            query,
+            limit=limit
+        )
+
+        return [
+            {
+                "run": dict(data["r"]),
+                "views": data["views"]
+            }
+            for data in result
+        ]
+
+
+def FilterByOpenMostBuyedRuns(limit):
+
+    query = """
+    MATCH (:Person)-[:Bought]->(:Ticket)-[:References]->(r:Run)
+
+    WHERE r.date > datetime()
+
+    RETURN r, count(*) AS buys
+
+    ORDER BY buys DESC
+
+    LIMIT $limit
+    """
+
+    with driver.session() as session:
+
+        result = session.run(
+            query,
+            limit=limit
+        )
+
+        return [
+            {
+                "run": dict(data["r"]),
+                "buys": data["buys"]
+            }
+            for data in result
+        ]
+
+
+def FilterByPersonMostViewedTracksOpenRuns(personDBAcessKey, limit):
+
+    query = """
+    MATCH (p:Person {
+        dBAcessKey:$personDBAcessKey
+    })-[v:Viewed]->(t:Track)<-[:OccursAt]-(r:Run)
+
+    WHERE r.date > datetime()
+
+    RETURN r, sum(v.times) AS views
+
+    ORDER BY views DESC
+
+    LIMIT $limit
+    """
+
+    with driver.session() as session:
+
+        result = session.run(
+            query,
+            personDBAcessKey=personDBAcessKey,
+            limit=limit
+        )
+
+        return [
+            {
+                "run": dict(data["r"]),
+                "views": data["views"]
+            }
+            for data in result
+        ]
+
+
+def FilterByPersonFavoriteTracksOpenRuns(personDBAcessKey, limit):
+
+    query = """
+    MATCH (p:Person {
+        dBAcessKey:$personDBAcessKey
+    })-[:Favorited]->(t:Track)<-[:OccursAt]-(r:Run)
+
+    WHERE r.date > datetime()
+
+    RETURN r
+
+    LIMIT $limit
+    """
+
+    with driver.session() as session:
+
+        result = session.run(
+            query,
+            personDBAcessKey=personDBAcessKey,
+            limit=limit
+        )
+
+        return [
+            {
+                "run": dict(data["r"])
+            }
+            for data in result
+        ]
+
+
+def FilterByPersonMostViewedHorsesOpenRuns(personDBAcessKey, limit):
+
+    query = """
+    MATCH (p:Person {
+        dBAcessKey:$personDBAcessKey
+    })-[v:Viewed]->(h:Horse)-[:RacesIn]->(r:Run)
+
+    WHERE r.date > datetime()
+
+    RETURN r, sum(v.times) AS views
+
+    ORDER BY views DESC
+
+    LIMIT $limit
+    """
+
+    with driver.session() as session:
+
+        result = session.run(
+            query,
+            personDBAcessKey=personDBAcessKey,
+            limit=limit
+        )
+
+        return [
+            {
+                "run": dict(data["r"]),
+                "views": data["views"]
+            }
+            for data in result
+        ]
+
+
+def FilterByPersonFavoriteHorsesOpenRuns(personDBAcessKey, limit):
+
+    query = """
+    MATCH (p:Person {
+        dBAcessKey:$personDBAcessKey
+    })-[:Favorited]->(h:Horse)-[:RacesIn]->(r:Run)
+
+    WHERE r.date > datetime()
+
+    RETURN r
+
+    LIMIT $limit
+    """
+
+    with driver.session() as session:
+
+        result = session.run(
+            query,
+            personDBAcessKey=personDBAcessKey,
+            limit=limit
+        )
+
+        return [
+            {
+                "run": dict(data["r"])
+            }
+            for data in result
+        ]
