@@ -179,13 +179,7 @@ class AppController:
 
         self.trocar_frame(frame)
 
-    def apostar(
-        self,
-        valor,
-        nome_corrida,
-        nome_cavalo,
-        odd
-    ):
+    def apostar(self, valor, corrida_id, nome_corrida, cavalo_id, nome_cavalo, odd):
 
         saldo_atual = float(
             self.usuario_logado["saldo"]
@@ -202,7 +196,10 @@ class AppController:
 
         # salva ticket
         RedisService.criar_ticket(
+            self.usuario_logado["id"],
+            corrida_id,
             nome_corrida,
+            cavalo_id,
             nome_cavalo,
             valor,
             odd

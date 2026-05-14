@@ -137,26 +137,32 @@ class RedisService:
 
     @staticmethod
     def criar_ticket(
-        nome_corrida,
-        nome_cavalo,
-        valor_pago,
-        odd
-    ):
+    usuario_id, 
+    corrida_id,
+    nome_corrida,
+    cavalo_id,   
+    nome_cavalo,
+    valor_pago,
+    odd
+):
 
         ticket_id = r.incr(
             "proximoTicketId"
         )
 
         r.hset(
-            f"ticket:{ticket_id}",
-            mapping={
-                "id": ticket_id,
-                "nome_corrida": nome_corrida,
-                "nome_cavalo": nome_cavalo,
-                "valor_pago": valor_pago,
-                "odd": odd
-            }
-        )
+        f"ticket:{ticket_id}",
+        mapping={
+            "id": ticket_id,
+            "usuario_id": usuario_id,
+            "corrida_id": corrida_id,
+            "cavalo_id": cavalo_id,  
+            "nome_corrida": nome_corrida,
+            "nome_cavalo": nome_cavalo,
+            "valor_pago": valor_pago,
+            "odd": odd
+        }
+    )
 
         RedisService.salvar_tickets_json()
 
@@ -263,7 +269,6 @@ class RedisService:
     @staticmethod
     def salvar_tickets_json():
 
-        print("🔥 tentando salvar tickets")
         tickets = []
 
         for chave in r.keys("ticket:*"):
@@ -271,12 +276,15 @@ class RedisService:
             dados = r.hgetall(chave)
 
             ticket_limpo = {
-                "id": dados["id"],
-                "nome_corrida": dados["nome_corrida"],
-                "nome_cavalo": dados["nome_cavalo"],
-                "valor_pago": dados["valor_pago"],
-                "odd": dados["odd"]
-            }
+            "id": dados["id"],
+            "usuario_id": dados.get("usuario_id"),
+            "corrida_id": dados.get("corrida_id"),
+            "cavalo_id": dados.get("cavalo_id"),
+            "nome_corrida": dados["nome_corrida"],
+            "nome_cavalo": dados["nome_cavalo"],
+            "valor_pago": dados["valor_pago"],
+            "odd": dados["odd"]
+        }
 
             tickets.append(ticket_limpo)
 
@@ -336,3 +344,40 @@ class RedisService:
             "proximoTicketId",
             maior_id
         )           
+        
+        
+    @staticmethod
+    def pagar_apostas(corrida_id, cavalo_vencedor_id):
+        
+
+        for chave in r.keys("ticket:*"):
+
+            ticket = r.hgetall(chave)
+
+            if ticket.get("corrida_id") != str(corrida_id):
+                continue
+
+            if ticket.get("cavalo_id") == cavalo_vencedor_id:
+
+                usuario_id = ticket.get("usuario_id")
+
+                if not usuario_id:
+                    continue
+
+                valor = float(ticket["valor_pago"])
+                odd = float(ticket["odd"])
+
+                premio = valor * odd
+
+                
+                user_key = f"usuario:{usuario_id}"
+                saldo = float(r.hget(user_key, "saldo"))
+
+                saldo += premio
+
+                RedisService.atualizar_saldo(
+                    usuario_id,
+                    saldo
+                )
+
+        RedisService.salvar_json()

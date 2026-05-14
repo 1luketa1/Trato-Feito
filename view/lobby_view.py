@@ -26,9 +26,12 @@ class LobbyView(tk.Frame):
             font=("Arial", 24, "bold")
         ).pack(pady=20)
 
+        self.saldo_var = tk.StringVar()
+        self.saldo_var.set(f"Saldo: R$ {usuario['saldo']:.2f}")
+
         tk.Label(
             self,
-            text=f"Saldo: R$ {usuario['saldo']:.2f}",
+            textvariable=self.saldo_var,
             font=("Arial", 18)
         ).pack(pady=10)
 
@@ -117,3 +120,5 @@ class LobbyView(tk.Frame):
                 relx=0.88,
                 rely=0.84
         )
+    def atualizar_saldo(self, novo_saldo):
+        self.saldo_var.set(f"Saldo: R$ {novo_saldo:.2f}")
