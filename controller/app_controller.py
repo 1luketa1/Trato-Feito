@@ -2,34 +2,45 @@ from model.usuario_model import Usuario
 from services.api_service import listar_corridas_ativas
 from services.redis_service import RedisService
 from tkinter import messagebox
+
 from view.login_view import LoginView
 from view.cadastro_view import CadastroView
 from view.lobby_view import LobbyView
 from view.corrida_view import CorridaView
 from view.banco_view import BancoView
 from view.configuracoes_view import ConfiguracoesView
-from services.redis_service import RedisService
-from tkinter import messagebox
 from view.tickets_view import TicketsView
-from services.api_service import listar_corridas
 from view.corridas_finalizadas_view import CorridasFinalizadasView
-from services.api_service import listar_corridas_finalizadas
-
-
 from view.criar_corrida_view import CriarCorridaView
+
+# =========================================
+# NOVAS VIEWS
+# =========================================
+
+from view.SearchView import SearchView
+from view.Run.RunListView import RunListView
+from view.Run.RunDetailsView import RunDetailsView
+
+# =========================================
+# API
+# =========================================
 
 from services.api_service import (
     listar_corridas_ativas,
     buscar_corrida,
     listar_pistas,
     listar_cavalos,
-    criar_corrida
+    criar_corrida,
+    listar_corridas_finalizadas
 )
 
-from view.pesquisa_view import PesquisaView
+# =========================================
+# NEO4J FILTERS
+# =========================================
+
+from services.NeoService import *
 
 class AppController:
-    
 
     def __init__(self, root):
 
@@ -41,8 +52,10 @@ class AppController:
         self.frame_atual = None
 
         self.usuario_logado = None
+
         RedisService.carregar_json()
         RedisService.carregar_tickets_json()
+
         self.mostrar_login()
 
     # =====================================================
@@ -55,7 +68,11 @@ class AppController:
             self.frame_atual.destroy()
 
         self.frame_atual = frame
-        self.frame_atual.pack(fill="both", expand=True)
+
+        self.frame_atual.pack(
+            fill="both",
+            expand=True
+        )
 
     # =====================================================
     # LOGIN
@@ -73,13 +90,24 @@ class AppController:
 
     def fazer_login(self, usuario, senha):
 
-        dados = RedisService.autenticar(usuario, senha)
+        dados = RedisService.autenticar(
+            usuario,
+            senha
+        )
 
         if dados:
+
             self.usuario_logado = dados
+
             self.mostrar_lobby()
+
         else:
-            messagebox.showerror("Erro", "Login inválido")
+
+            messagebox.showerror(
+                "Erro",
+                "Login inválido"
+            )
+
     # =====================================================
     # CADASTRO
     # =====================================================
@@ -88,31 +116,44 @@ class AppController:
 
         frame = CadastroView(
             self.root,
-            self.cadastrar_usuario,  
+            self.cadastrar_usuario,
             self.mostrar_login
         )
 
         self.trocar_frame(frame)
 
-    def cadastrar_usuario(self, usuario, senha):
+    def cadastrar_usuario(
+        self,
+        usuario,
+        senha
+    ):
 
-        criado = RedisService.criar_usuario(usuario, senha)
+        criado = RedisService.criar_usuario(
+            usuario,
+            senha
+        )
 
         if criado:
-            messagebox.showinfo("Sucesso", "Usuário criado!")
+
+            messagebox.showinfo(
+                "Sucesso",
+                "Usuário criado!"
+            )
+
             self.mostrar_login()
+
         else:
-            messagebox.showerror("Erro", "Usuário já existe")
+
+            messagebox.showerror(
+                "Erro",
+                "Usuário já existe"
+            )
 
     # =====================================================
     # LOBBY
     # =====================================================
-    def criar_corrida(self):
-
-        print("Criar corrida clicado")
 
     def mostrar_lobby(self):
-        self.corridas = listar_corridas_ativas()
 
         corridas = listar_corridas_ativas()
 
@@ -133,7 +174,7 @@ class AppController:
         self.trocar_frame(frame)
 
     # =====================================================
-    # CONFIGURAÇÕES
+    # CONFIG
     # =====================================================
 
     def mostrar_configuracoes(self):
@@ -145,72 +186,212 @@ class AppController:
         )
 
         self.trocar_frame(frame)
-        
-    def salvar_config(self, tema, idioma, nivel_aposta):
 
-        self.usuario_logado["tema"] = tema
-        self.usuario_logado["idioma"] = idioma
-        self.usuario_logado["nivel_aposta"] = nivel_aposta
-
-        Usuario.salvar_config(
-            tema,
-            idioma,
-            nivel_aposta
-        )
-
-        messagebox.showinfo(
-            "Sucesso",
-            "Configurações salvas!"
-        )
+    # =====================================================
+    # CORRIDA
+    # =====================================================
 
     def mostrar_corrida(self, corrida_id):
 
-        from services.api_service import buscar_corrida
-
-        corrida = buscar_corrida(corrida_id)
+        corrida = buscar_corrida(
+            corrida_id
+        )
 
         frame = CorridaView(
             self.root,
             corrida,
             self.usuario_logado,
             self.apostar,
-            self.mostrar_lobby,
+            self.mostrar_lobby
         )
 
         self.trocar_frame(frame)
 
-    def apostar(self, valor, corrida_id, nome_corrida, cavalo_id, nome_cavalo, odd):
+    # =====================================================
+    # SEARCH VIEW
+    # =====================================================
 
-        saldo_atual = float(
-            self.usuario_logado["saldo"]
+    def mostrar_pesquisa(self):
+
+        frame = SearchView(
+            self.root,
+            self.abrir_lista_pesquisa,
+            self.mostrar_lobby
         )
 
-        saldo_atual -= valor
+        self.trocar_frame(frame)
 
-        self.usuario_logado["saldo"] = saldo_atual
+    # =====================================================
+    # ABRIR LISTA
+    # =====================================================
 
-        RedisService.atualizar_saldo(
-            self.usuario_logado["id"],
-            saldo_atual
+    def abrir_lista_pesquisa(
+        self,
+        nome_filtro
+    ):
+
+        limite = 20
+
+        usuario_id = str(
+            self.usuario_logado["id"]
         )
 
-        # salva ticket
-        RedisService.criar_ticket(
-            self.usuario_logado["id"],
+        filtros = {
+
+            # =====================================
+            # ALL RUNS
+            # =====================================
+
+            "FilterByAllMostViewedRuns":
+                lambda:
+                    FilterByAllMostViewedRuns(
+                        limite
+                    ),
+
+            "FilterByAllMostBuyedRuns":
+                lambda:
+                    FilterByAllMostBuyedRuns(
+                        limite
+                    ),
+
+            "FilterByPersonFavoriteTracksAllRuns":
+                lambda:
+                    FilterByPersonFavoriteTracksAllRuns(
+                        usuario_id,
+                        limite
+                    ),
+
+            "FilterByPersonMostViewedTracksAllRuns":
+                lambda:
+                    FilterByPersonMostViewedTracksAllRuns(
+                        usuario_id,
+                        limite
+                    ),
+
+            "FilterByPersonFavoriteHorsesAllRuns":
+                lambda:
+                    FilterByPersonFavoriteHorsesAllRuns(
+                        usuario_id,
+                        limite
+                    ),
+
+            "FilterByPersonMostViewedHorsesAllRuns":
+                lambda:
+                    FilterByPersonMostViewedHorsesAllRuns(
+                        usuario_id,
+                        limite
+                    ),
+
+            # =====================================
+            # OPEN RUNS
+            # =====================================
+
+            "FilterByMostViewedOpenRuns":
+                lambda:
+                    FilterByMostViewedOpenRuns(
+                        limite
+                    ),
+
+            "FilterByOpenMostBuyedRuns":
+                lambda:
+                    FilterByOpenMostBuyedRuns(
+                        limite
+                    ),
+
+            "FilterByPersonFavoriteTracksOpenRuns":
+                lambda:
+                    FilterByPersonFavoriteTracksOpenRuns(
+                        usuario_id,
+                        limite
+                    ),
+
+            "FilterByPersonMostViewedTracksOpenRuns":
+                lambda:
+                    FilterByPersonMostViewedTracksOpenRuns(
+                        usuario_id,
+                        limite
+                    ),
+
+            "FilterByPersonFavoriteHorsesOpenRuns":
+                lambda:
+                    FilterByPersonFavoriteHorsesOpenRuns(
+                        usuario_id,
+                        limite
+                    ),
+
+            "FilterByPersonMostViewedHorsesOpenRuns":
+                lambda:
+                    FilterByPersonMostViewedHorsesOpenRuns(
+                        usuario_id,
+                        limite
+                    )
+        }
+
+        if nome_filtro not in filtros:
+
+            messagebox.showerror(
+                "Erro",
+                "Filtro não encontrado"
+            )
+
+            return
+
+        resultados = filtros[
+            nome_filtro
+        ]()
+
+        corridas_ids = []
+
+        for item in resultados:
+
+            run = item["run"]
+
+            corridas_ids.append(
+                run["dBAcessKey"]
+            )
+
+        self.mostrar_lista_corridas(
+            corridas_ids
+        )
+
+    # =====================================================
+    # RUN LIST
+    # =====================================================
+
+    def mostrar_lista_corridas(
+        self,
+        corridas_ids
+    ):
+
+        frame = RunListView(
+            self.root,
+            corridas_ids,
+            self.mostrar_detalhes_corrida,
+            self.mostrar_pesquisa
+        )
+
+        self.trocar_frame(frame)
+
+    # =====================================================
+    # RUN DETAILS
+    # =====================================================
+
+    def mostrar_detalhes_corrida(
+        self,
+        corrida_id
+    ):
+
+        frame = RunDetailsView(
+            self.root,
             corrida_id,
-            nome_corrida,
-            cavalo_id,
-            nome_cavalo,
-            valor,
-            odd
+            self.usuario_logado["id"]
         )
 
-        messagebox.showinfo(
-            "Aposta registrada",
-            "Ticket salvo com sucesso!"
-        )
+        self.trocar_frame(frame)
 
-        self.mostrar_lobby()
+    # =====================================================
+    # BANCO
+    # =====================================================
 
     def mostrar_banco(self):
 
@@ -219,51 +400,43 @@ class AppController:
             self.usuario_logado,
             self.depositar,
             self.sacar,
-            self.mostrar_lobby,
+            self.mostrar_lobby
         )
 
         self.trocar_frame(frame)
 
-    def depositar(self, valor):
-
-        saldo_atual = float(self.usuario_logado["saldo"])
-
-        saldo_atual += valor
-
-        self.usuario_logado["saldo"] = saldo_atual
-
-        RedisService.atualizar_saldo(
-            self.usuario_logado["id"],
-            saldo_atual
-        )
-
-        self.mostrar_lobby()
-            
-    def sacar(self, valor):
-
-        saldo_atual = float(self.usuario_logado["saldo"])
-
-        saldo_atual -= valor
-
-        self.usuario_logado["saldo"] = saldo_atual
-
-        RedisService.atualizar_saldo(
-            self.usuario_logado["id"],
-            saldo_atual
-        )
-
-        self.mostrar_lobby()
-        # =====================================================
-    # LOGOUT
+    # =====================================================
+    # TICKETS
     # =====================================================
 
-    def logout(self):
+    def mostrar_tickets(self):
 
-        self.usuario_logado = None
+        tickets = RedisService.listar_tickets()
 
-        self.mostrar_login()
-        
-    
+        frame = TicketsView(
+            self.root,
+            tickets,
+            self.mostrar_lobby
+        )
+
+        self.trocar_frame(frame)
+
+    # =====================================================
+    # FINALIZADAS
+    # =====================================================
+
+    def mostrar_corridas_finalizadas(self):
+
+        corridas = listar_corridas_finalizadas()
+
+        frame = CorridasFinalizadasView(
+            self.root,
+            corridas,
+            self.mostrar_lobby
+        )
+
+        self.trocar_frame(frame)
+
     # =====================================================
     # CRIAR CORRIDA
     # =====================================================
@@ -283,33 +456,6 @@ class AppController:
         )
 
         self.trocar_frame(frame)
-        
-    def mostrar_corridas_finalizadas(self):
-
-        corridas = listar_corridas_finalizadas()
-
-        frame = CorridasFinalizadasView(
-            self.root,
-            corridas,
-            self.mostrar_lobby
-        )
-
-        self.trocar_frame(frame)
-
-    # =====================================================
-    # PESQUISA
-    # =====================================================
-
-    def mostrar_pesquisa(self):
-
-        frame = PesquisaView(
-            self.root,
-            self.registrar_pesquisa,
-            self.mostrar_lobby
-        )
-
-        self.trocar_frame(frame)
-
 
     def salvar_corrida(self, dados):
 
@@ -321,25 +467,101 @@ class AppController:
         )
 
         self.mostrar_lobby()
-    def registrar_pesquisa(self, texto):
 
-        Usuario.salvar_pesquisa(
-        self.usuario_logado["usuario"],
-        texto
-    )
-        
     # =====================================================
-    # TICKETS
+    # APOSTA
     # =====================================================
 
-    def mostrar_tickets(self):
+    def apostar(
+        self,
+        valor,
+        corrida_id,
+        nome_corrida,
+        cavalo_id,
+        nome_cavalo,
+        odd
+    ):
 
-        tickets = RedisService.listar_tickets()
-
-        frame = TicketsView(
-            self.root,
-            tickets,
-            self.mostrar_lobby
+        saldo_atual = float(
+            self.usuario_logado["saldo"]
         )
 
-        self.trocar_frame(frame)
+        saldo_atual -= valor
+
+        self.usuario_logado[
+            "saldo"
+        ] = saldo_atual
+
+        RedisService.atualizar_saldo(
+            self.usuario_logado["id"],
+            saldo_atual
+        )
+
+        RedisService.criar_ticket(
+            self.usuario_logado["id"],
+            corrida_id,
+            cavalo_id,
+            nome_corrida,
+            nome_cavalo,
+            valor,
+            odd
+        )
+
+        messagebox.showinfo(
+            "Aposta registrada",
+            "Ticket salvo com sucesso!"
+        )
+
+        self.mostrar_lobby()
+
+    # =====================================================
+    # BANCO
+    # =====================================================
+
+    def depositar(self, valor):
+
+        saldo_atual = float(
+            self.usuario_logado["saldo"]
+        )
+
+        saldo_atual += valor
+
+        self.usuario_logado[
+            "saldo"
+        ] = saldo_atual
+
+        RedisService.atualizar_saldo(
+            self.usuario_logado["id"],
+            saldo_atual
+        )
+
+        self.mostrar_lobby()
+
+    def sacar(self, valor):
+
+        saldo_atual = float(
+            self.usuario_logado["saldo"]
+        )
+
+        saldo_atual -= valor
+
+        self.usuario_logado[
+            "saldo"
+        ] = saldo_atual
+
+        RedisService.atualizar_saldo(
+            self.usuario_logado["id"],
+            saldo_atual
+        )
+
+        self.mostrar_lobby()
+
+    # =====================================================
+    # LOGOUT
+    # =====================================================
+
+    def logout(self):
+
+        self.usuario_logado = None
+
+        self.mostrar_login()

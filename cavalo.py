@@ -3,6 +3,12 @@ from bson import ObjectId
 
 from database import cavalos_collection
 
+from services.NeoService import (
+    CreateHorse,
+    UpdateHorseName,
+    DeleteHorse
+)
+
 router = APIRouter(prefix="/cavalos")
 
 
@@ -23,12 +29,23 @@ def listar_cavalos():
 @router.get("/{id}")
 def buscar_cavalo(id: str):
 
+
     cavalo = cavalos_collection.find_one({
         "_id": ObjectId(id)
     })
 
     if cavalo:
         cavalo["_id"] = str(cavalo["_id"])
+
+    
+    # =====================================
+        # CRIA NO NEO4J
+        # =====================================
+
+        CreateHorse(
+            dBAcessKey=cavalo["_id"],
+            name=cavalo.get("nome", "Sem nome")
+        )
 
     return cavalo
 
@@ -38,8 +55,18 @@ def criar_cavalo(cavalo: dict):
 
     resultado = cavalos_collection.insert_one(cavalo)
 
+    cavalo_id = str(
+        resultado.inserted_id
+    )
+    
+    # cria no Neo4j
+    CreateHorse(
+        dBAcessKey=str(cavalo_id),
+        name=cavalo.get("nome")
+    )
+
     return {
-        "id": str(resultado.inserted_id)
+        "id": cavalo_id
     }
 
 
@@ -51,7 +78,15 @@ def atualizar_cavalo(id: str, cavalo: dict):
         {"$set": cavalo}
     )
 
-    return {"msg": "Cavalo atualizado"}
+    # atualiza no Neo4j
+    UpdateHorseName(
+        dBAcessKey=id,
+        name=cavalo.get("nome")
+    )
+
+    return {
+        "msg": "Cavalo atualizado"
+    }
 
 
 @router.delete("/{id}")
@@ -61,4 +96,11 @@ def deletar_cavalo(id: str):
         "_id": ObjectId(id)
     })
 
-    return {"msg": "Cavalo deletado"}
+    # deleta no Neo4j
+    DeleteHorse(
+        dBAcessKey=id
+    )
+
+    return {
+        "msg": "Cavalo deletado"
+    }

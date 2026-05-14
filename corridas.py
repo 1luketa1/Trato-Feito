@@ -9,6 +9,16 @@ from database import (
     cavalos_collection
 )
 
+# =========================
+# NEO4J
+# =========================
+
+from services.NeoService import (
+    CreateRun,
+    UpdateRunDate,
+    DeleteRun
+)
+
 router = APIRouter(prefix="/corridas")
 
 def converter_objectid(obj):
@@ -48,6 +58,7 @@ def serialize_mongo(doc):
         return str(doc)
     else:
         return doc
+
 
 @router.get("/")
 def listar_corridas():
@@ -150,6 +161,7 @@ def listar_corridas_ativas():
 
     return corridas
 
+
 @router.get("/finalizadas")
 def listar_corridas_finalizadas():
 
@@ -198,7 +210,7 @@ def listar_corridas_finalizadas():
 
         corridas.append(corrida)
 
-    # 🔥 CONVERSÃO GLOBAL FINAL (resolve 100% dos ObjectId)
+    # 🔥 CONVERSÃO GLOBAL FINAL
     return serialize_mongo(corridas)
 
 
@@ -239,6 +251,7 @@ def buscar_corrida(id: str):
 
     return converter_objectid(corrida)
 
+
 @router.post("/")
 def criar_corrida(corrida: dict):
 
@@ -249,6 +262,10 @@ def criar_corrida(corrida: dict):
         )
     except:
         return {"erro": "Data inválida. Use DD-MM-AAAA"}
+
+    pista_id_original = corrida["pista_id"]
+
+    cavalos_originais = corrida["cavalos"]
 
     corrida["pista_id"] = ObjectId(
         corrida["pista_id"]
@@ -263,12 +280,110 @@ def criar_corrida(corrida: dict):
         corrida
     )
 
+    corrida_id = str(
+        resultado.inserted_id
+    )
+
+    # =========================
+    # NEO4J
+    # =========================
+
+    CreateRun(
+        date=corrida["data"].isoformat(),
+        horsesDBAcessKeys=cavalos_originais,
+        trackDBAcessKey=pista_id_original,
+        dBAcessKey=corrida_id
+    )
+
     return {
         "msg": "Corrida criada",
-        "id": str(resultado.inserted_id)
+        "id": corrida_id
     }
-    
-    
+
+
+@router.put("/{id}")
+def atualizar_corrida(id: str, corrida: dict):
+
+    dados_update = deepcopy(corrida)
+
+    # =========================
+    # DATA
+    # =========================
+
+    if "data" in dados_update:
+
+        try:
+
+            data_convertida = datetime.strptime(
+                dados_update["data"],
+                "%d-%m-%Y"
+            )
+
+            dados_update["data"] = data_convertida
+
+            # =========================
+            # NEO4J
+            # =========================
+
+            UpdateRunDate(
+                dBAcessKey=id,
+                newDate=data_convertida.isoformat()
+            )
+
+        except:
+            return {
+                "erro": "Data inválida"
+            }
+
+    # =========================
+    # PISTA
+    # =========================
+
+    if "pista_id" in dados_update:
+
+        dados_update["pista_id"] = ObjectId(
+            dados_update["pista_id"]
+        )
+
+    # =========================
+    # CAVALOS
+    # =========================
+
+    if "cavalos" in dados_update:
+
+        dados_update["cavalos"] = [
+            ObjectId(c)
+            for c in dados_update["cavalos"]
+        ]
+
+    corridas_collection.update_one(
+        {"_id": ObjectId(id)},
+        {"$set": dados_update}
+    )
+
+    return {
+        "msg": "Corrida atualizada"
+    }
+
+
+@router.delete("/{id}")
+def deletar_corrida(id: str):
+
+    corridas_collection.delete_one({
+        "_id": ObjectId(id)
+    })
+
+    # =========================
+    # NEO4J
+    # =========================
+
+    DeleteRun(id)
+
+    return {
+        "msg": "Corrida deletada"
+    }
+
+
 @router.post("/{id}/simular")
 def simular_corrida_api(id: str):
 
@@ -290,6 +405,3 @@ def simular_corrida_api(id: str):
     )
 
     return resultado
-
-
-

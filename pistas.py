@@ -3,8 +3,21 @@ from bson import ObjectId
 
 from database import pistas_collection
 
+# =========================================
+# NEO4J
+# =========================================
+
+from services.NeoService import (
+    CreateTrack,
+    DeleteTrack
+)
+
 router = APIRouter(prefix="/pistas")
 
+
+# =========================================
+# LISTAR
+# =========================================
 
 @router.get("/")
 def listar_pistas():
@@ -20,6 +33,10 @@ def listar_pistas():
     return pistas
 
 
+# =========================================
+# BUSCAR
+# =========================================
+
 @router.get("/{id}")
 def buscar_pista(id: str):
 
@@ -33,26 +50,70 @@ def buscar_pista(id: str):
     return pista
 
 
+# =========================================
+# CRIAR
+# =========================================
+
 @router.post("/")
 def criar_pista(pista: dict):
 
-    resultado = pistas_collection.insert_one(pista)
+    resultado = pistas_collection.insert_one(
+        pista
+    )
+
+    pista_id = str(
+        resultado.inserted_id
+    )
+
+    # =====================================
+    # NEO4J
+    # =====================================
+
+    CreateTrack(
+        dBAcessKey=pista_id,
+        name=pista.get("nome", "")
+    )
 
     return {
-        "id": str(resultado.inserted_id)
+        "id": pista_id
     }
 
 
+# =========================================
+# ATUALIZAR
+# =========================================
+
 @router.put("/{id}")
-def atualizar_pista(id: str, pista: dict):
+def atualizar_pista(
+    id: str,
+    pista: dict
+):
 
     pistas_collection.update_one(
         {"_id": ObjectId(id)},
         {"$set": pista}
     )
 
-    return {"msg": "Pista atualizada"}
+    # =====================================
+    # OPCIONAL:
+    # Se tiver UpdateTrack no NeoService
+    # =====================================
 
+    """
+    UpdateTrack(
+        dBAcessKey=id,
+        name=pista.get("nome", "")
+    )
+    """
+
+    return {
+        "msg": "Pista atualizada"
+    }
+
+
+# =========================================
+# DELETAR
+# =========================================
 
 @router.delete("/{id}")
 def deletar_pista(id: str):
@@ -61,4 +122,14 @@ def deletar_pista(id: str):
         "_id": ObjectId(id)
     })
 
-    return {"msg": "Pista deletada"}
+    # =====================================
+    # NEO4J
+    # =====================================
+
+    DeleteTrack(
+        dBAcessKey=id
+    )
+
+    return {
+        "msg": "Pista deletada"
+    }

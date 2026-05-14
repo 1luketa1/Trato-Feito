@@ -21,14 +21,31 @@ def CreatePerson(name, dBAcessKey):
     with driver.session() as session:
         session.run(query, name=name, dBAcessKey=dBAcessKey)
 
-def CreateTicket(value, buyerDBAcessKey, runDBAcessKey, horseBetDBAcessKey, dBAcessKey):
-    
+
+def CreateTicket(
+    value,
+    buyerDBAcessKey,
+    runDBAcessKey,
+    horseBetDBAcessKey,
+    dBAcessKey
+):
+
     '''
     FUTURE OPTIMIZATION:
 
     (Person)-[:PlacedBetOn {times}]->(Horse)
     (Person)-[:BetOnTrack {times}]->(Track)
     '''
+
+    print("\n==============================")
+    print("CreateTicket FOI CHAMADO")
+    print("==============================")
+
+    print("value:", value)
+    print("buyerDBAcessKey:", buyerDBAcessKey)
+    print("runDBAcessKey:", runDBAcessKey)
+    print("horseBetDBAcessKey:", horseBetDBAcessKey)
+    print("dBAcessKey:", dBAcessKey)
 
     query = """
     MATCH (p:Person {
@@ -54,11 +71,17 @@ def CreateTicket(value, buyerDBAcessKey, runDBAcessKey, horseBetDBAcessKey, dBAc
     MERGE (t)-[:References]->(r)
 
     MERGE (t)-[:BetsOn]->(h)
+
+    RETURN p, r, h, t
     """
+
+    print("Abrindo sessão Neo4j...")
 
     with driver.session() as session:
 
-        session.run(
+        print("Executando query...")
+
+        result = session.run(
             query,
             value=value,
             buyerDBAcessKey=buyerDBAcessKey,
@@ -67,6 +90,18 @@ def CreateTicket(value, buyerDBAcessKey, runDBAcessKey, horseBetDBAcessKey, dBAc
             dBAcessKey=dBAcessKey
         )
 
+        data = result.single()
+
+        print("Resultado query:", data)
+
+        if data:
+            print("Ticket criado com sucesso!")
+        else:
+            print("ERRO: MATCH não encontrou Person, Run ou Horse")
+
+    print("Sessão finalizada")
+    print("==============================\n")
+        
 
 def CreateDeposit(value, buyerdBAcessKey, dBAcessKey):
 
@@ -99,7 +134,7 @@ def CreateHorse(name, dBAcessKey):
         dBAcessKey:$dBAcessKey
     })
     """
-
+    print("CAVAVAAAALLLOO AAA CRIAAAAA")
     with driver.session() as session:
 
         session.run(
