@@ -1,52 +1,149 @@
 # Trato-Feito
 
-pip install neo4j
+Sistema de apostas em corridas de cavalos desenvolvido para a disciplina CCD410.
 
-pip install fastapi
+---
 
-pip install uvicorn
+## Tema do Projeto
 
-pip install pymongo
+O projeto "Trato-Feito" simula uma plataforma de apostas em corridas de cavalos, onde usuários podem:
 
-pip install requests
+- Criar conta e fazer login
+- Depositar e sacar dinheiro
+- Visualizar corridas disponíveis
+- Apostar em cavalos
+- Simular corridas
+- Receber prêmios com base nas odds
 
-pip install python-dotenv
 
-pip install redis
+---
 
-COMANDOS PARA RODAR O PROJETO
+## Arquitetura e Bancos de Dados
 
-1. LIGAR O REDIS (Docker)
-   
-baixar o docker
+### Redis
+
+Utilizado como banco principal da aplicação.
+
+Funções:
+- Armazenamento de usuários
+- Controle de saldo
+- Armazenamento de tickets (apostas)
+- Persistência em JSON
+
+Justificativa:
+Redis foi escolhido por ser rápido e eficiente para operações frequentes como leitura e escrita de saldo e apostas.
+
+---
+
+### MongoDB
+
+Utilizado para armazenar dados estruturados da aplicação.
+
+Funções:
+- Corridas
+- Cavalos
+- Pistas
+
+Justificativa:
+MongoDB permite trabalhar com documentos flexíveis, facilitando o armazenamento de estruturas complexas como corridas com múltiplos cavalos.
+
+---
+
+### Neo4j
+
+Utilizado para análise de relações entre entidades.
+
+Funções:
+- Relação entre usuários, apostas, corridas e cavalos
+- Possível recomendação de apostas
+
+Justificativa:
+Neo4j é adequado para representar relações complexas em forma de grafo.
+
+---
+
+## Backend
+
+O backend foi implementado utilizando:
+
+- FastAPI para criação da API
+- Uvicorn como servidor
+
+A API é responsável por:
+- Gerenciar corridas
+- Simular resultados
+- Fornecer dados para o frontend (Tkinter)
+
+---
+
+## Como Executar o Projeto
+
+### 1. Instalar dependências
+
+pip install neo4j  
+pip install fastapi  
+pip install uvicorn  
+pip install pymongo  
+pip install requests  
+pip install python-dotenv  
+pip install redis  
+
+---
+
+### 2. Configurar o .env
+
+O arquivo .env é necessário para conexão com o MongoDB.
+
+O conteúdo foi enviado separadamente por email.
+
+O assunto do Email é ( Conteúdo do .env CCD410 do grupo 38 )
+
+---
+
+### 3. Iniciar o Redis (Docker)
+
+Instalar o Docker:  
 https://www.docker.com/products/docker-desktop/
 
-tem q estar com o docker baixado e aberto 
+Primeira execução:
 
-Na primeira vez use: 
 docker run -d -p 6379:6379 --name redis-tf redis
 
-Nas outras pode usar :
+Execuções seguintes:
+
 docker start redis-tf
 
 Verificar se está rodando:
 
 docker ps
 
+---
 
-2. LIGAR A API (FastAPI)
+### 4. Iniciar a API
 
 python -m uvicorn api:app --reload
 
-Quando estiver funcionando, deve aparecer:
+Deve aparecer:
 
 Uvicorn running on http://127.0.0.1:8000
 
+---
 
-3. RODAR O APP PRINCIPAL
+### 5. Executar o sistema
 
 Em outro terminal:
 
 python main.py
 
-4. PRECISA DO .env PRA RODAR (Caio Henrique mandou no chat do moodle o conteudo do .env)
+---
+
+## Observações
+
+- Redis é essencial para funcionamento do sistema
+- MongoDB é necessário via .env
+
+---
+
+## Autores
+
+Caio Henrique De Oliveira Fonseca - 24124066-2
