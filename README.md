@@ -49,4 +49,4 @@ Em outro terminal:
 
 python main.py
 
-4. PRECISA DO .env PRA RODAR 
+4. PRECISA DO .env PRA RODAR (Caio Henrique mandou no chat do moodle o conteudo do .env)
