@@ -16,6 +16,7 @@ class CorridaView(tk.Frame):
         usuario,
         aposta_callback,
         voltar_callback,
+        pagar_callback,
     ):
 
         super().__init__(master)
@@ -168,8 +169,8 @@ Odd: {odd:.2f}
 
             vencedor_id = resultado["vencedor"]
             nome_vencedor = self.mapa_cavalos.get(vencedor_id, vencedor_id)
-
-            # 💰 PAGAMENTO
+            pagar_callback(corrida["_id"], vencedor_id)
+            
             RedisService.pagar_apostas(
                 corrida["_id"],
                 vencedor_id   

@@ -12,6 +12,8 @@ from view.configuracoes_view import ConfiguracoesView
 from view.tickets_view import TicketsView
 from view.corridas_finalizadas_view import CorridasFinalizadasView
 from view.criar_corrida_view import CriarCorridaView
+from services.redis_service import r
+
 
 # =========================================
 # NOVAS VIEWS
@@ -202,7 +204,8 @@ class AppController:
             corrida,
             self.usuario_logado,
             self.apostar,
-            self.mostrar_lobby
+            self.mostrar_lobby,
+            self.pagar_apostas
         )
 
         self.trocar_frame(frame)
@@ -513,6 +516,20 @@ class AppController:
         )
 
         self.mostrar_lobby()
+
+
+    def pagar_apostas(self, corrida_id, vencedor_id):
+
+        RedisService.pagar_apostas(corrida_id, vencedor_id)
+
+        for chave in r.keys("usuario:*"):
+
+            usuario = r.hgetall(chave)
+
+            if usuario.get("id") == str(self.usuario_logado["id"]):
+
+                self.usuario_logado["saldo"] = float(usuario["saldo"])
+                break
 
     # =====================================================
     # BANCO
