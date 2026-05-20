@@ -1,7 +1,8 @@
-from fastapi import FastAPI
+import tkinter as tk
+from controller.app_controller import AppController
 
-app = FastAPI()
+root = tk.Tk()
 
-@app.get("/")
-def home():
-    return {"msg": "API funcionando"}
+app = AppController(root)
+
+root.mainloop()

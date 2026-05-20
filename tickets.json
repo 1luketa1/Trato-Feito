@@ -1,0 +1,262 @@
+[
+    {
+        "id": "4",
+        "usuario_id": "1",
+        "corrida_id": "6a051b742d7f69112fd93cea",
+        "cavalo_id": "6a033f5836196a5ed2b6ff54",
+        "nome_corrida": "t7",
+        "nome_cavalo": "Trovão Negro",
+        "valor_pago": "12.0",
+        "odd": "1.78"
+    },
+    {
+        "id": "7",
+        "usuario_id": "1",
+        "corrida_id": "6a051c2e2d7f69112fd93ced",
+        "cavalo_id": "6a033f5836196a5ed2b6ff54",
+        "nome_corrida": "t10",
+        "nome_cavalo": "Trovão Negro",
+        "valor_pago": "12.0",
+        "odd": "1.77"
+    },
+    {
+        "id": "5",
+        "usuario_id": "1",
+        "corrida_id": "6a051b912d7f69112fd93ceb",
+        "cavalo_id": "6a033f5836196a5ed2b6ff54",
+        "nome_corrida": "t8",
+        "nome_cavalo": "Trovão Negro",
+        "valor_pago": "12.0",
+        "odd": "1.77"
+    },
+    {
+        "id": "20",
+        "usuario_id": "1",
+        "corrida_id": "6a0600f24f34357e9947bb2d",
+        "cavalo_id": "AAAAAAAA2",
+        "nome_corrida": "6a05f51261564119b81652c0",
+        "nome_cavalo": "Furacão Azul",
+        "valor_pago": "23.0",
+        "odd": "5.11"
+    },
+    {
+        "id": "10",
+        "usuario_id": "1",
+        "corrida_id": "6a051d729f2556e1e47cc29d",
+        "cavalo_id": "6a033f5836196a5ed2b6ff54",
+        "nome_corrida": "12",
+        "nome_cavalo": "Trovão Negro",
+        "valor_pago": "12.0",
+        "odd": "1.75"
+    },
+    {
+        "id": "22",
+        "usuario_id": "1",
+        "corrida_id": "6a060a3726a59e5757e64039",
+        "cavalo_id": "6a05f51061564119b81652bf",
+        "nome_corrida": "corrida teste",
+        "nome_cavalo": "Trovão Negro",
+        "valor_pago": "12.0",
+        "odd": "1.74"
+    },
+    {
+        "id": "18",
+        "usuario_id": "1",
+        "corrida_id": "6a05f6f57a92cd554db6588e",
+        "cavalo_id": "teste",
+        "nome_corrida": "6a05f51261564119b81652c2",
+        "nome_cavalo": "Relâmpago Branco",
+        "valor_pago": "12.0",
+        "odd": "2.3"
+    },
+    {
+        "id": "14",
+        "usuario_id": "1",
+        "corrida_id": "6a0526eb0d544d959a26217d",
+        "cavalo_id": "aa",
+        "nome_corrida": "6a033f5836196a5ed2b6ff57",
+        "nome_cavalo": "Relâmpago Branco",
+        "valor_pago": "12.0",
+        "odd": "2.34"
+    },
+    {
+        "id": "8",
+        "usuario_id": "1",
+        "corrida_id": "6a051c3b2d7f69112fd93cee",
+        "cavalo_id": "6a033f5836196a5ed2b6ff56",
+        "nome_corrida": "t12",
+        "nome_cavalo": "Tempestade Real",
+        "valor_pago": "12.0",
+        "odd": "1.85"
+    },
+    {
+        "id": "9",
+        "usuario_id": "1",
+        "corrida_id": "6a051d479f2556e1e47cc29c",
+        "cavalo_id": "6a033f5836196a5ed2b6ff54",
+        "nome_corrida": "t14",
+        "nome_cavalo": "Trovão Negro",
+        "valor_pago": "12.0",
+        "odd": "1.8"
+    },
+    {
+        "id": "23",
+        "usuario_id": "1",
+        "corrida_id": "6a060d80327a040bb5054061",
+        "cavalo_id": "6a05f51061564119b81652bf",
+        "nome_corrida": "t72",
+        "nome_cavalo": "Trovão Negro",
+        "valor_pago": "100.0",
+        "odd": "1.75"
+    },
+    {
+        "id": "16",
+        "usuario_id": "1",
+        "corrida_id": "6a05f5c575b9561bd1331d2d",
+        "cavalo_id": "teste 1",
+        "nome_corrida": "6a05f51261564119b81652c1",
+        "nome_cavalo": "Tempestade Real",
+        "valor_pago": "12.0",
+        "odd": "1.95"
+    },
+    {
+        "id": "17",
+        "usuario_id": "1",
+        "corrida_id": "6a05f6f57a92cd554db6588e",
+        "cavalo_id": "teste",
+        "nome_corrida": "6a05f51061564119b81652bf",
+        "nome_cavalo": "Trovão Negro",
+        "valor_pago": "12.0",
+        "odd": "1.77"
+    },
+    {
+        "id": "2",
+        "usuario_id": "1",
+        "corrida_id": "6a0519de55deb0062c09a4a6",
+        "cavalo_id": "6a033f5836196a5ed2b6ff57",
+        "nome_corrida": "t5",
+        "nome_cavalo": "Relâmpago Branco",
+        "valor_pago": "12.0",
+        "odd": "2.24"
+    },
+    {
+        "id": "1",
+        "usuario_id": "1",
+        "corrida_id": "6a0518e155deb0062c09a4a5",
+        "cavalo_id": "6a033f5836196a5ed2b6ff54",
+        "nome_corrida": "t4",
+        "nome_cavalo": "Trovão Negro",
+        "valor_pago": "12.0",
+        "odd": "1.76"
+    },
+    {
+        "id": "15",
+        "usuario_id": "1",
+        "corrida_id": "6a05f5c575b9561bd1331d2d",
+        "cavalo_id": "teste 1",
+        "nome_corrida": "6a05f51061564119b81652bf",
+        "nome_cavalo": "Trovão Negro",
+        "valor_pago": "12.0",
+        "odd": "1.98"
+    },
+    {
+        "id": "3",
+        "usuario_id": "1",
+        "corrida_id": "6a051abb66063ce047c0a910",
+        "cavalo_id": "6a033f5836196a5ed2b6ff54",
+        "nome_corrida": "t6",
+        "nome_cavalo": "Trovão Negro",
+        "valor_pago": "12.0",
+        "odd": "1.77"
+    },
+    {
+        "id": "21",
+        "usuario_id": "1",
+        "corrida_id": "6a0600f24f34357e9947bb2d",
+        "cavalo_id": "6a05f51261564119b81652c0",
+        "nome_corrida": "AAAAAAAA2",
+        "nome_cavalo": "Furacão Azul",
+        "valor_pago": "3.0",
+        "odd": "5.06"
+    },
+    {
+        "id": "6",
+        "usuario_id": "1",
+        "corrida_id": "6a051c1b2d7f69112fd93cec",
+        "cavalo_id": "6a033f5836196a5ed2b6ff54",
+        "nome_corrida": "t9",
+        "nome_cavalo": "Trovão Negro",
+        "valor_pago": "12.0",
+        "odd": "1.75"
+    },
+    {
+        "id": "25",
+        "usuario_id": "1",
+        "corrida_id": "6a0e39d208f0e0a312d02ae0",
+        "cavalo_id": "6a05f51061564119b81652bf",
+        "nome_corrida": "ttstsjdshg",
+        "nome_cavalo": "Trovão Negro",
+        "valor_pago": "300.0",
+        "odd": "1.79"
+    },
+    {
+        "id": "12",
+        "usuario_id": "1",
+        "corrida_id": "6a0526eb0d544d959a26217d",
+        "cavalo_id": "6a033f5836196a5ed2b6ff54",
+        "nome_corrida": "aa",
+        "nome_cavalo": "Trovão Negro",
+        "valor_pago": "12.0",
+        "odd": "1.74"
+    },
+    {
+        "id": "26",
+        "usuario_id": "1",
+        "corrida_id": "6a0e39f008f0e0a312d02ae1",
+        "cavalo_id": "6a05f51061564119b81652bf",
+        "nome_corrida": "testedfs adsa",
+        "nome_cavalo": "Trovão Negro",
+        "valor_pago": "300.0",
+        "odd": "1.77"
+    },
+    {
+        "id": "19",
+        "usuario_id": "1",
+        "corrida_id": "6a05fdf4f730ea499f8a7ba6",
+        "cavalo_id": "teste mais u",
+        "nome_corrida": "6a05f51261564119b81652c1",
+        "nome_cavalo": "Tempestade Real",
+        "valor_pago": "40.0",
+        "odd": "1.98"
+    },
+    {
+        "id": "13",
+        "usuario_id": "1",
+        "corrida_id": "6a0526eb0d544d959a26217d",
+        "cavalo_id": "aa",
+        "nome_corrida": "6a033f5836196a5ed2b6ff54",
+        "nome_cavalo": "Trovão Negro",
+        "valor_pago": "12.0",
+        "odd": "1.79"
+    },
+    {
+        "id": "24",
+        "usuario_id": "1",
+        "corrida_id": "6a060fc283518cccd080a315",
+        "cavalo_id": "6a05f51061564119b81652bf",
+        "nome_corrida": "ffe",
+        "nome_cavalo": "Trovão Negro",
+        "valor_pago": "200.0",
+        "odd": "1.78"
+    },
+    {
+        "id": "11",
+        "usuario_id": "1",
+        "corrida_id": "6a05254ea4aee3307317790f",
+        "cavalo_id": "6a033f5836196a5ed2b6ff54",
+        "nome_corrida": "teste",
+        "nome_cavalo": "Trovão Negro",
+        "valor_pago": "12.0",
+        "odd": "1.98"
+    }
+]

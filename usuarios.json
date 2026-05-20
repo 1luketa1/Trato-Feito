@@ -1,0 +1,38 @@
+[
+    {
+        "id": "3",
+        "nome": "sla",
+        "senha": "1",
+        "saldo": "0"
+    },
+    {
+        "id": "5",
+        "nome": "davi",
+        "senha": "1",
+        "saldo": "0"
+    },
+    {
+        "id": "2",
+        "nome": "admin1",
+        "senha": "123",
+        "saldo": "0"
+    },
+    {
+        "id": "1",
+        "nome": "admin",
+        "senha": "123",
+        "saldo": "1189.1599999999999"
+    },
+    {
+        "id": "6",
+        "nome": "lurca",
+        "senha": "1",
+        "saldo": "0"
+    },
+    {
+        "id": "4",
+        "nome": "a",
+        "senha": "1",
+        "saldo": "0"
+    }
+]
