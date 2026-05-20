@@ -147,7 +147,10 @@ python main.py
 ## Autores
 
 Caio Henrique de Oliveira Fonseca - RA 24.124.066-2 
+
 Davi Smuczek Loureiro - RA 24.124.016-7 
+
 Lucas Rossi Dotzlaw - RA 24.124.025-8
+
 Wilson Massaiolli Chacon - RA 24.124.038-1
 
