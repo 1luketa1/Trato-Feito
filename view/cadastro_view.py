@@ -9,22 +9,18 @@ class CadastroView(tk.Frame):
 
         tk.Label(self, text="Cadastro", font=("Arial", 24, "bold")).pack(pady=20)
 
-        # USUÁRIO
         tk.Label(self, text="Usuário").pack()
         self.user = tk.Entry(self, width=30)
         self.user.pack(pady=5)
 
-        # SENHA
         tk.Label(self, text="Senha").pack()
         self.senha = tk.Entry(self, show="*", width=30)
         self.senha.pack(pady=5)
 
-        # CONFIRMAR SENHA
         tk.Label(self, text="Confirmar Senha").pack()
         self.confirmar = tk.Entry(self, show="*", width=30)
         self.confirmar.pack(pady=5)
 
-        # FUNÇÃO CADASTRAR
         def cadastrar():
 
             usuario = self.user.get()
@@ -42,8 +38,6 @@ class CadastroView(tk.Frame):
             print("BOTÃO FOI CLICADO")
 
             cadastro_callback(usuario, senha)
-
-        # BOTÕES
         tk.Button(
             self,
             text="Cadastrar",

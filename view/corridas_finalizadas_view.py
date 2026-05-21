@@ -11,9 +11,6 @@ class CorridasFinalizadasView(tk.Frame):
     ):
         super().__init__(master)
 
-        # =========================
-        # BOTÃO VOLTAR (TOPO ESQUERDA)
-        # =========================
         tk.Button(
             self,
             text="← Voltar",
@@ -31,9 +28,6 @@ class CorridasFinalizadasView(tk.Frame):
 
         for corrida in corridas:
 
-            # =========================
-            # CABEÇALHO
-            # =========================
             header = f"""
 🏁 {corrida['nome']}
 Pista: {corrida['pista']['nome']}
@@ -48,25 +42,16 @@ Status: {corrida['status']}
                 anchor="w"
             ).pack(fill="x", padx=20, pady=(10, 0))
 
-            # =========================
-            # MAPA DE CAVALOS
-            # =========================
             mapa_cavalos = {
                 cavalo["_id"]: cavalo["nome"]
                 for cavalo in corrida.get("cavalos", [])
             }
 
-            # =========================
-            # RESULTADO ORDENADO
-            # =========================
             resultados = sorted(
                 corrida.get("resultado", []),
                 key=lambda x: x["posicao"]
             )
 
-            # =========================
-            # PLACAR
-            # =========================
             placar_texto = ""
 
             for r in resultados:

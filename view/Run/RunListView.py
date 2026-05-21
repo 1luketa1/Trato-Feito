@@ -2,7 +2,7 @@ import tkinter as tk
 
 from services.api_service import buscar_corrida
 
-#Esta em View.Run
+#Esta em View.Run usa esse mesmo
 class RunListView(tk.Frame):
 
     def __init__(

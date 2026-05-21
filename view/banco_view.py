@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 
-
+#tava com problema mas agora acho que ta resolvido
 class BancoView(tk.Frame):
 
     def __init__(

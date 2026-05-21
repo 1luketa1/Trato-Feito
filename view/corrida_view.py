@@ -41,10 +41,6 @@ Distância: {pista['distancia']} km
             """
         ).pack(pady=10)
 
-        # =====================================================
-        # CAVALOS
-        # =====================================================
-
         self.cavalo = tk.StringVar()
 
         self.mapa_cavalos = {} 
@@ -68,9 +64,6 @@ Resistência: {cavalo['estatisticas']['resistencia']}
                 value=cavalo_id 
             ).pack(anchor="w", padx=80)
 
-        # =====================================================
-        # SALDO
-        # =====================================================
 
         tk.Label(
             self,
@@ -81,14 +74,6 @@ Resistência: {cavalo['estatisticas']['resistencia']}
 
         self.valor = tk.Entry(self)
         self.valor.pack()
-
-        # =====================================================
-        # APOSTAR
-        # =====================================================
-
-        # =====================================================
-        # APOSTAR
-        # =====================================================
 
         def apostar():
 
@@ -155,9 +140,6 @@ Odd: {odd:.2f}
                     "Erro",
                     "Valor inválido"
                 )
-        # =====================================================
-        # SIMULAR
-        # =====================================================
 
         def simular():
 
@@ -188,10 +170,6 @@ Odd: {odd:.2f}
             messagebox.showinfo("Resultado da Corrida", texto_resultado)
 
             voltar_callback()
-
-        # =====================================================
-        # BOTÕES
-        # =====================================================
 
         tk.Button(
             self,

@@ -26,7 +26,6 @@ class RedisService:
     @staticmethod
     def criar_usuario(nome, senha):
 
-        # verifica duplicação
         for chave in r.keys("usuario:*"):
 
             usuario = r.hgetall(chave)
@@ -34,12 +33,10 @@ class RedisService:
             if usuario.get("nome", "").lower() == nome.lower():
                 return False
 
-        # gera ID
         usuarioId = str(
             r.incr("proximoUsuarioId")
         )
 
-        # salva no Redis
         r.hset(
             f"usuario:{usuarioId}",
             mapping={
@@ -50,13 +47,11 @@ class RedisService:
             }
         )
 
-        # salva no Neo4j
         CreatePerson(
             name=nome,
             dBAcessKey=usuarioId
         )
 
-        # salva no JSON
         RedisService.salvar_json()
 
         return True
@@ -166,7 +161,6 @@ class RedisService:
                     mapping=usuario
                 )
 
-                # recria no Neo4j
                 CreatePerson(
                     name=usuario["nome"],
                     dBAcessKey=usuario_id
@@ -216,7 +210,6 @@ class RedisService:
             }
         )
 
-        # salva no Neo4j
         CreateTicket(
             value=float(valor_pago),
             buyerDBAcessKey=str(usuario_id),
@@ -282,7 +275,6 @@ class RedisService:
 
         ticket = r.hgetall(chave)
 
-        # atualiza valor no Neo4j
         if "valor_pago" in novos_dados:
 
             UpdateTicketValue(
@@ -308,12 +300,10 @@ class RedisService:
         if not r.exists(chave):
             return False
 
-        # deleta no Neo4j
         DeleteTicket(
             dBAcessKey=str(ticket_id)
         )
 
-        # deleta no Redis
         r.delete(chave)
 
         RedisService.salvar_tickets_json()
@@ -394,7 +384,6 @@ class RedisService:
                 mapping=ticket
             )
 
-            # recria no Neo4j
             CreateTicket(
                 value=float(
                     ticket["valor_pago"]

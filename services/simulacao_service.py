@@ -11,15 +11,12 @@ def simular_corrida(corrida_id):
 
     probabilidades = odds_data["probabilidades"]
 
-    # 🎯 simulação baseada em performance real (ruído + probabilidade)
     performances = {}
 
     for cavalo_id, prob in probabilidades.items():
-        # quanto maior a probabilidade, melhor a média de performance
         performance = random.gauss(prob, 0.1)
         performances[cavalo_id] = performance
 
-    # 🏁 ranking real da corrida
     ranking = sorted(
         performances.items(),
         key=lambda x: x[1],
@@ -39,7 +36,6 @@ def simular_corrida(corrida_id):
 
         posicao += 1
 
-    # 🏆 verdadeiro vencedor = primeiro do ranking
     vencedor = ranking[0][0]
 
     return {

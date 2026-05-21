@@ -23,27 +23,17 @@ class CriarCorridaView(tk.Frame):
             font=("Arial", 24, "bold")
         ).pack(pady=20)
 
-        # =====================================================
-        # NOME
-        # =====================================================
 
         tk.Label(self, text="Nome da corrida").pack()
 
         self.nome = tk.Entry(self, width=40)
         self.nome.pack(pady=5)
 
-        # =====================================================
-        # DATA
-        # =====================================================
 
         tk.Label(self, text="Data (DD-MM-AAAA)").pack()
 
         self.data = tk.Entry(self, width=40)
         self.data.pack(pady=5)
-
-        # =====================================================
-        # PISTA
-        # =====================================================
 
         tk.Label(self, text="Pista").pack()
 
@@ -63,9 +53,6 @@ class CriarCorridaView(tk.Frame):
             *nomes_pistas
         ).pack(pady=5)
 
-        # =====================================================
-        # CAVALOS
-        # =====================================================
 
         tk.Label(
             self,
@@ -88,9 +75,6 @@ class CriarCorridaView(tk.Frame):
                 variable=var
             ).pack(anchor="w", padx=250)
 
-        # =====================================================
-        # BOTÕES
-        # =====================================================
 
         def criar_corrida():
 

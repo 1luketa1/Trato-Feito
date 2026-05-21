@@ -4,16 +4,12 @@ from bson import ObjectId
 import os
 from datetime import datetime
 
-# =========================================
-# NEO4J
-# =========================================
 from services.NeoService import (
     CreateHorse,
     CreateTrack,
     CreateRun
 )
 
-# carregar .env
 load_dotenv()
 
 MONGO_URI = os.getenv("MONGO_URI")
@@ -21,24 +17,16 @@ MONGO_URI = os.getenv("MONGO_URI")
 client = MongoClient(MONGO_URI)
 db = client["Aposta"]
 
-# coleções
 cavalos_collection = db["Cavalos"]
 pistas_collection = db["Pistas"]
 corridas_collection = db["Corridas"]
 
-# =========================================
-# LIMPAR
-# =========================================
 
 cavalos_collection.delete_many({})
 pistas_collection.delete_many({})
 corridas_collection.delete_many({})
 
 print("Coleções limpas.")
-
-# =========================================
-# FUNÇÕES (IGUAIS À API)
-# =========================================
 
 def criar_cavalo(cavalo: dict):
     resultado = cavalos_collection.insert_one(cavalo)
@@ -86,11 +74,6 @@ def criar_corrida(corrida: dict):
     )
 
     return corrida_id
-
-
-# =========================================
-# INSERIR CAVALOS (COMPLETO)
-# =========================================
 
 cavalos = [
     {
@@ -194,9 +177,6 @@ cavalos_ids = [criar_cavalo(c) for c in cavalos]
 
 print("Cavalos OK (completos + Neo4j)")
 
-# =========================================
-# INSERIR PISTAS
-# =========================================
 
 pistas = [
     {"nome": "Autódromo Central", "tipo": "seca", "distancia": 5},
@@ -208,9 +188,6 @@ pistas_ids = [criar_pista(p) for p in pistas]
 
 print("Pistas OK")
 
-# =========================================
-# INSERIR CORRIDAS
-# =========================================
 
 corridas = [
     {
